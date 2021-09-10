@@ -52,6 +52,8 @@ RUN \
 	chmod +x /usr/local/bin/terragrunt && \
 	# Check that it's installed
 	terragrunt --version
+	
+RUN alias tf=terraform
 
 # Give back control
 USER root
