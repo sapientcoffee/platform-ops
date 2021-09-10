@@ -10,7 +10,8 @@ RUN \
 	# Update
 	apt-get update -y && \
 	# Install dependencies
-	apt-get install unzip wget -y
+	apt-get install unzip wget -y && apt-get clean && rm -rf /var/cache/apt/* && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/*
+
 
 ################################
 # Install Terraform
