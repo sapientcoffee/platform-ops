@@ -55,5 +55,10 @@ RUN \
 
 RUN echo 'alias tf=terraform' >> ~/.bashrc
 
+################################
+# Install Firebase
+################################
+RUN curl -sL https://firebase.tools | bash
+
 # Give back control
 USER root
