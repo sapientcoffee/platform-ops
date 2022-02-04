@@ -1,8 +1,9 @@
 steps:
 - name: 'gcr.io/kaniko-project/executor:latest'
-  args:
-  - --destination=europe-west2-docker.pkg.dev/coffee-with-rob/espresso-gcp/espresso:latest
-  - --cache=true
-  - --cache-ttl=24h
+  args: [
+    "--destination=europe-west2-docker.pkg.dev/coffee-with-rob/espresso-gcp/espresso:latest",
+    "--dockerfile=Dockerfile-gitpod",
+    "--cache=true",
+    "--cache-ttl=24h"]
   
 timeout: '1600s'
