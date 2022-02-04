@@ -1,6 +1,6 @@
 [![Edit directly in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/SapientCoffee/platform-ops.git)
 
-[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/SapientCoffee/platform-ops.git cloudshell_image=europe-west2-docker.pkg.dev/coffee-with-rob/espresso-gcp/espresso)
+[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/SapientCoffee/platform-ops.git&cloudshell_image=europe-west2-docker.pkg.dev/coffee-with-rob/espresso-gcp/espresso)
 
 # Platform Team Focus
 As we move more and more to remote development environments we need to have images to drive optimal experiance. This is a collection of image build to support remote development in environments like;
