@@ -12,6 +12,18 @@ The following is a high-level overview of remote development in GCP using Cloud 
 ![](Remote-Developer-Environment.jpg)
 
 
+
+```
+export CUSTOM_ENV_REPO_ID="europe-west2-docker.pkg.dev/coffee-with-rob/espresso-gcp"
+export CUSTOM_ENV_PROJECT_ID="coffee-with-rob"
+```
+
+```
+cloudshell env build-local
+cloudshell env run
+```
+
+
 TODO
 * Cloud Build with TF
 * Investigate Cloud Build with KCC
