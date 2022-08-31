@@ -1,7 +1,7 @@
 steps:
 - name: 'gcr.io/kaniko-project/executor:latest'
   args: [
-    "--destination=europe-west2-docker.pkg.dev/coffee-with-rob/espresso-gcp/espresso:latest",
+    "--destination=europe-docker.pkg.dev/coffee-roaster-base/platform-ops/workspace:cloudshell",
     "--dockerfile=Dockerfile-cloudshell",
     "--cache=true",
     "--cache-ttl=24h"]
