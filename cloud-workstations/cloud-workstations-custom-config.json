@@ -3,7 +3,8 @@
     "host_config": {
       "gce_instance_config": {
         "machine_type": "e2-standard-8",
-        "pool_size": 1                  
+        "pool_size": 1,
+        "service_account": "97022409609-compute@developer.gserviceaccount.com"                  
       }
     },
     "persistentDirectories": [
