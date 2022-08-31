@@ -1,9 +1,13 @@
+```
 export PROJECT="coffee-break-rob"
 export REGION="europe-west1"
 export CLUSTER="workstations-cluster"
 export WORKSTATION="custom-image"
+```
 
+```
 gcloud config set compute/region ${REGION}
+```
 
 NOTE: In private preview at the moment
 
@@ -12,7 +16,7 @@ NOTE: In private preview at the moment
 ```
 curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
  -H "Content-Type: application/json" \
- -d @cluster.json \
+ -d @cloud-workstations-cluster.json \
 "https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters?workstation_cluster_id=${CLUSTER}"
 
 ```
@@ -31,7 +35,7 @@ curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
 #### Create
 curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
  -H "Content-Type: application/json" \
- -d @config-platform.json \
+ -d @cloud-workstations-config-default.json \
 "https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER}/workstationConfigs?workstation_config_id=default"
 ```
 
@@ -39,7 +43,7 @@ curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
 ```
 curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
  -H "Content-Type: application/json" \
- -d @config-platform.json \
+ -d @cloud-workstations-config-default.json \
  -X PATCH https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER}/workstationConfigs?workstation_config_id=default
 ```
 
@@ -70,7 +74,7 @@ curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
 #### Create
 curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
  -H "Content-Type: application/json" \
- -d @config-platform.json \
+ -d @cloud-workstations-custom-config.json \
 "https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER}/workstationConfigs?workstation_config_id=${WORKSTATION}"
 ```
 
@@ -78,7 +82,7 @@ curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
 ```
 curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
  -H "Content-Type: application/json" \
- -d @config-platform.json \
+ -d @cloud-workstations-custom-config.json \
  -X PATCH https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER}/workstationConfigs?workstation_config_id=${WORKSTATION}
 ```
 
