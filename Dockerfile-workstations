@@ -11,19 +11,19 @@ USER root
 ################################
 
 # Download terraform for linux
-RUN wget --progress=dot:mega https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+# RUN wget --progress=dot:mega https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
 
-RUN \
-	# Unzip
-	unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
-	# Move to local bin
-	mv terraform /usr/local/bin/ && \
-	# Make it executable
-	chmod +x /usr/local/bin/terraform && \
-	# Check that it's installed
-	terraform --version
+# RUN \
+# 	# Unzip
+# 	unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
+# 	# Move to local bin
+# 	mv terraform /usr/local/bin/ && \
+# 	# Make it executable
+# 	chmod +x /usr/local/bin/terraform && \
+# 	# Check that it's installed
+# 	terraform --version
 
-RUN echo 'alias tf=terraform' >> ~/.bashrc
+# RUN echo 'alias tf=terraform' >> ~/.bashrc
 
 ################################
 # Install Firebase
