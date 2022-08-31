@@ -6,4 +6,4 @@ steps:
     "--cache=true",
     "--cache-ttl=24h"]
   
-timeout: '1600s'
+timeout: '3600s'
