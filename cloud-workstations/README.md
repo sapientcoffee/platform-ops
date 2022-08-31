@@ -33,10 +33,19 @@ curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
 
 ### Default (Base Image)
 #### Create
+```
 curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
  -H "Content-Type: application/json" \
  -d @cloud-workstations-config-default.json \
 "https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER}/workstationConfigs?workstation_config_id=default"
+```
+
+#### Status Check
+Creating the config should take a minute or less. You can check on it by running the following command:
+```
+curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+ -H "Content-Type: application/json" \
+"https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER}/workstationConfigs/default"
 ```
 
 #### Update
@@ -61,22 +70,25 @@ curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
  -X DELETE https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER}/workstationConfigs/default
 ```
 
-#### Status Check
-Creating the config should take a minute or less. You can check on it by running the following command:
-```
-curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
- -H "Content-Type: application/json" \
-"https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER}/workstationConfigs/default"
-
-
 ### Custom Image - VS Code
 
 #### Create
+```
 curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
  -H "Content-Type: application/json" \
  -d @cloud-workstations-custom-config.json \
 "https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER}/workstationConfigs?workstation_config_id=${WORKSTATION}"
 ```
+
+
+#### Status Check
+Creating the config should take a minute or less. You can check on it by running the following command:
+```
+curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+ -H "Content-Type: application/json" \
+"https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER}/workstationConfigs/${WORKSTATION}"
+```
+
 
 #### Update
 ```
@@ -99,14 +111,6 @@ curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
  -H "Content-Type: application/json" \
  -X DELETE https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER}/workstationConfigs/${WORKSTATION}
 ```
-
-#### Status Check
-Creating the config should take a minute or less. You can check on it by running the following command:
-```
-curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
- -H "Content-Type: application/json" \
-"https://workstations.googleapis.com/v1alpha1/projects/${PROJECT}/locations/${REGION}/workstationClusters/${CLUSTER}/workstationConfigs/${WORKSTATION}"
-
 
 
 ## Access
