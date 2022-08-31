@@ -3,9 +3,7 @@
     "host_config": {
       "gce_instance_config": {
         "machine_type": "e2-standard-8",
-        "pool_size": 1,
-        "config.disable_public_ip_addresses": false,     
-        "config.tags": "workstations"                     
+        "pool_size": 1                  
       }
     },
     "persistentDirectories": [
@@ -22,7 +20,7 @@
     "container": {
         "image": "europe-docker.pkg.dev/coffee-roaster-base/platform-ops/workspace:cloudworkstation",
         "env": {"TEST":"Hello Coffee", "SECRET":"shhhh"},
-        "working_dir":"~/workspace",
+        "working_dir":"~/workspace"
 
     },
   }
