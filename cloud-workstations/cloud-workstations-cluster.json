@@ -1,0 +1,9 @@
+{
+    "network": "projects/coffee-break-rob/global/networks/default",
+    
+    "subnetwork": "projects/coffee-break-rob/regions/europe-west1/subnetworks/default", 
+    "privateClusterConfig": {
+        "enablePrivateEndpoint": false
+    }
+}
+    

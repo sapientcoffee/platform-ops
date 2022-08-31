@@ -1,0 +1,31 @@
+{
+    "idleTimeout": "7200s",
+    "host_config": {
+      "gce_instance_config": {
+        "machine_type": "e2-standard-8",
+        "pool_size": 1,
+      //   "config.service_account": "",
+        "config.disable_public_ip_addresses": false,      //[bool] Disable VM public IP?
+        "config.tags": "workstations"                     // Network tags
+      }
+    },
+    "persistentDirectories": [
+      {
+        "mountPath": "/home",                             // Directories whose contents would be preserved across workstation sessions.
+        "gcePd": {
+          "sizeGb": 200,
+          "diskType": "pd-standard",
+          "fsType": "ext4"
+        }
+      }
+    ],
+  
+    "container": {
+        "image": "europe-docker.pkg.dev/coffee-roaster-base/platform-ops/workspace:cloudworkstation",
+      //   "command": "",                                       // overide the default ENTRYPOINT
+      //   "arg": "",                                           // Arguments passed to the entrypoint
+        "env": {"TEST":"Hello Coffee", "SECRET":"shhhh"},
+        "working_dir":"~/workspace",
+      //   "run_as_user":"",
+    },
+  }
