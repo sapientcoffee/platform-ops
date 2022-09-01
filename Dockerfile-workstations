@@ -30,6 +30,10 @@ USER root
 ################################
 RUN curl -sL https://firebase.tools | bash
 
+# bashrc config
+RUN echo 'alias tf=terraform' >> ~/.bashrc
+RUN echo 'alias ll="ls -lrt"' >> ~/.bashrc
+
 # Give back control
 USER root
 
