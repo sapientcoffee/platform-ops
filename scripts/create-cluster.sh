@@ -47,7 +47,7 @@ main() {
         -H "Content-Type: application/json" \
     https://workstations.googleapis.com/v1alpha1/projects/${PROJECT_ID}/locations/${REGION}/workstationClusters/${CLUSTERID} | grep -q reconciling)
     do
-        info " ... Still building ..."
+        info " Still building ..."
         sleep 120
     done
         success "Your cluster is ready"
@@ -55,10 +55,11 @@ main() {
 }
 
 environment(){
-    info "Project: $PROJECT_ID";
-    info "Region: $REGION";
-    info "Filename: $FILENAME";
-    info "Clusterid: $CLUSTERID";
+    printenv
+    info "Project: ${PROJECT_ID}";
+    info "Region: ${REGION}";
+    info "Filename: ${FILENAME}";
+    info "Clusterid: ${CLUSTERID}";
 }
 
 main "$@"
