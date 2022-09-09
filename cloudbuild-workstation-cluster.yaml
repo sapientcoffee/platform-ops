@@ -7,8 +7,20 @@ steps:
     env:
       - 'CLUSTERID=${_CLUSTERID}'
       - 'PROJECT_ID=${_PROJECT_ID}'
-      - 'FILENAME=${_FILENAME}'
+      - 'SETTINGS=${_SETTINGS}'
       - 'REGION=${_REGION}'
     args:
       - scripts/create-cluster.sh
     id: Create Workstation Cluster
+
+  - name: >-
+      gcr.io/cloud-foundation-cicd/cft/developer-tools@sha256:8fc216f7eb1e66498b8c778ba5e5d4ca26d5c0a4e6f30bd0b1a8e8342bbde226
+    env:
+      - 'CLUSTERID=${_CLUSTERID}'
+      - 'PROJECT_ID=${_PROJECT_ID}'
+      - 'SETTINGS=${_SETTINGS}'
+      - 'REGION=${_REGION}'
+      - 'CONFIG=${_CONFIG}'
+    args:
+      - scripts/create-config.sh
+    id: Applying Workstation Cluster Config
