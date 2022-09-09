@@ -3,7 +3,7 @@
     
     "subnetwork": "projects/coffee-break-rob/regions/europe-west1/subnetworks/default", 
     "privateClusterConfig": {
-        "enablePrivateEndpoint": false
+        "enablePrivateEndpoint": true
     }
 }
     
