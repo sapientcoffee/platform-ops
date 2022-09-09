@@ -1,0 +1,26 @@
+{
+    "idleTimeout": "7200s",
+    "host": {
+        "gce_instance": {
+        "machine_type": "e2-standard-8",
+        "pool_size": 1
+        }
+    },
+    "persistentDirectories": [
+    {
+        "mountPath": "/home",
+        "gcePd": {
+        "sizeGb": 200,
+        "fsType": "ext4"
+        }
+    }
+    ],
+    
+    "container": {
+        "image": "us-central1-docker.pkg.dev/cloud-workstations-images/predefined/intellij-ultimate:latest",
+        "env": {"TEST":"Hello Coffee", "SECRET":"shhhh"},
+        "working_dir":"~/workspace"
+
+    }
+    }
+    
