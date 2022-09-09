@@ -35,14 +35,14 @@ main() {
     info "The following are the environment settings ..."
     environment
 
-    if checkCluster true; then
+
+    if [ checkCluster ] 
+    then
         success "Cluster already exists"
         updateCluster
-    elif checkCluster false
+    else 
         info "Cluster does not exist"
         createCluster
-    else
-        fail "Something went wrong!"
     fi
 
 }
