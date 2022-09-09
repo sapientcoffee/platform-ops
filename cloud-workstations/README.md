@@ -29,6 +29,13 @@ curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
 
 ```
 
+```
+curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+ -H "Content-Type: application/json" \
+ -d @cloud-workstations-cluster.json \
+ -X PATCH https://workstations.googleapis.com/v1beta/projects/coffee-break-rob/locations/europe-west2/workstationClusters/playing
+```
+
 ## Platform Admin
 
 ### Default (Base Image)

@@ -77,24 +77,15 @@ createCluster() {
 
 updateCluster() {
     # Update the workstation cluster
+    info "Updating cluster"
+
     curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
         -H "Content-Type: application/json" \
         -d @${SETTINGS} \
-        -X PATCH https://workstations.googleapis.com//v1beta/projects/${PROJECT_ID}/locations/${REGION}/workstationClusters/${CLUSTERID}/workstationConfigs/${SETTINGS}
-    info "Updating cluster"
-
-    while (curl -s -H "Authorization: Bearer $(gcloud auth print-access-token)" \
-        -H "Content-Type: application/json" \
-    https://workstations.googleapis.com/v1beta/projects/${PROJECT_ID}/locations/${REGION}/workstationClusters/${CLUSTERID} | grep -q reconciling)
-    do
-        info " Still updating ..."
-        sleep 15
-    done
-        success "Your cluster is ready"
-
+        -X PATCH https://workstations.googleapis.com/v1beta/projects/${PROJECT_ID}/locations/${REGION}/workstationClusters/${CLUSTERID}
+    
+    success "Your cluster has been updated"
     return
-
-
 }
 
 environment(){
