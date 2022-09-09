@@ -40,12 +40,9 @@ main() {
     curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
         -H "Content-Type: application/json" \
         -d @${FILENAME} \
-    if create; then
-        info "Your cluster is being created. This script will terminate once it is available."
-    else
-        fail "Something Went wrong"
-
-
+    https://workstations.googleapis.com/v1alpha1/projects/${PROJECT_ID}/locations/${REGION}/workstationClusters?workstation_cluster_id=${CLUSTERID}
+    info "Your cluster is being created. This script will terminate once it is available."
+    
     while (curl -s -H "Authorization: Bearer $(gcloud auth print-access-token)" \
         -H "Content-Type: application/json" \
     https://workstations.googleapis.com/v1alpha1/projects/${PROJECT_ID}/locations/${REGION}/workstationClusters/${CLUSTERID} | grep -q reconciling)
@@ -55,10 +52,6 @@ main() {
     done
         success "Your cluster is ready"
 
-}
-
-create() {
-    https://workstations.googleapis.com/v1alpha1/projects/${PROJECT_ID}/locations/${REGION}/workstationClusters?workstation_cluster_id=${CLUSTERID}
 }
 
 environment(){
