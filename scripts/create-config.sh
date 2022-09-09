@@ -39,13 +39,13 @@ main() {
     curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
             -H "Content-Type: application/json" \
                 -d @${SETTINGS} \
-            https://workstations.googleapis.com/v1alpha1/projects/${PROJECT_ID}/locations/${REGION}/workstationClusters/${CLUSTERID}/workstationConfigs?workstation_config_id=${CONFIG}
+            https://workstations.googleapis.com/v1beta/projects/${PROJECT_ID}/locations/${REGION}/workstationClusters/${CLUSTERID}/workstationConfigs?workstation_config_id=${CONFIG}
     
     info "Applying cluster configuration ..... please hold the line."
     
     while (curl -s -H "Authorization: Bearer $(gcloud auth print-access-token)" \
         -H "Content-Type: application/json" \
-    https://workstations.googleapis.com/v1alpha1/projects/${PROJECT_ID}/locations/${REGION}/workstationClusters/${CLUSTERID}/workstationConfigs/${CONFIG} | grep -q reconciling)
+    https://workstations.googleapis.com/v1beta/projects/${PROJECT_ID}/locations/${REGION}/workstationClusters/${CLUSTERID}/workstationConfigs/${CONFIG} | grep -q reconciling)
     do
         sleep 30
     done
