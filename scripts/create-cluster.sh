@@ -35,6 +35,29 @@ main() {
     info "The following are the environment settings ..."
     environment
 
+    if checkCluster true; then
+        success "Cluster already exists"
+        updateCluster
+    elif checkCluster false
+        info "Cluster does not exist"
+        createCluster
+    else
+        fail "Something went wrong!"
+    fi
+
+}
+
+checkCluster() {
+    # Check to see if cluster already exists 
+    curl -s -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+        -H "Content-Type: application/json" \
+    https://workstations.googleapis.com/v1beta/projects/${PROJECT_ID}/locations/${REGION}/workstationClusters/ | grep -q ${CLUSTERID}
+
+    return $?
+}
+
+createCluster() {
+    # create the workstation cluster
     curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
         -H "Content-Type: application/json" \
         -d @${SETTINGS} \
@@ -49,6 +72,28 @@ main() {
         sleep 120
     done
         success "Your cluster is ready"
+    return
+}
+
+updateCluster() {
+    # Update the workstation cluster
+    curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+        -H "Content-Type: application/json" \
+        -d @${SETTINGS} \
+        -X PATCH https://workstations.googleapis.com//v1beta/projects/${PROJECT_ID}/locations/${REGION}/workstationClusters/${CLUSTERID}/workstationConfigs/${SETTINGS}
+    info "Updating cluster"
+
+    while (curl -s -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+        -H "Content-Type: application/json" \
+    https://workstations.googleapis.com/v1beta/projects/${PROJECT_ID}/locations/${REGION}/workstationClusters/${CLUSTERID} | grep -q reconciling)
+    do
+        info " Still updating ..."
+        sleep 15
+    done
+        success "Your cluster is ready"
+
+    return
+
 
 }
 
