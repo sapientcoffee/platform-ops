@@ -1,7 +1,8 @@
 {
     "idleTimeout": "7200s",
-    "host_config": {
-      "gce_instance_config": {
+    "runningTimeout": 24,
+    "host": {
+      "gce_instance": {
         "machine_type": "e2-standard-8",
         "pool_size": 1,
         "service_account": "97022409609-compute@developer.gserviceaccount.com"                  
