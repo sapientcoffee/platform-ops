@@ -55,7 +55,6 @@ main() {
 }
 
 environment(){
-    printenv
     info "Project: ${PROJECT_ID}";
     info "Region: ${REGION}";
     info "Filename: ${FILENAME}";
