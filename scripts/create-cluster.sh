@@ -39,7 +39,7 @@ main() {
         -H "Content-Type: application/json" \
         -d @${SETTINGS} \
     https://workstations.googleapis.com/v1beta/projects/${PROJECT_ID}/locations/${REGION}/workstationClusters?workstation_cluster_id=${CLUSTERID}
-    info "Your cluster is being created. This script will terminate once it is available."
+    info "Creating or updating Workstation Cluster ..... please hold the line (might be 15-20 min)."
     
     while (curl -s -H "Authorization: Bearer $(gcloud auth print-access-token)" \
         -H "Content-Type: application/json" \

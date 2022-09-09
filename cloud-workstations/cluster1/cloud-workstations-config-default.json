@@ -1,0 +1,19 @@
+{
+    "idleTimeout": "7200s",
+    "host_config": {
+    "gce_instance_config": {
+    "machine_type": "e2-standard-8",
+    "pool_size": 1
+    }
+    },
+    "persistentDirectories": [
+    {
+    "mountPath": "/home",
+    "gcePd": {
+    "sizeGb": 200,
+    "fsType": "ext4"
+    }
+    }
+    ]
+    }
+    
