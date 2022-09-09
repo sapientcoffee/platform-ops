@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
 #==============================================================================
-# Title:                
 # Description:          x
-# Author:          		Rob Edwards (@sapientcoffee)
-# Date:                 
-# Version:              0.1
 # Notes:                
 #                       
 # Limitations/issues:
@@ -43,13 +39,13 @@ main() {
 
     curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
         -H "Content-Type: application/json" \
-        -d @$filename \
-    https://workstations.googleapis.com/v1alpha1/projects/${project}/locations/${region}/workstationClusters?workstation_cluster_id=${clusterid}
+        -d @${FILENAME} \
+    https://workstations.googleapis.com/v1alpha1/projects/${PROJECT_ID}/locations/${REGION}/workstationClusters?workstation_cluster_id=${CLUSTERID}
     info Your cluster is being created. This script will terminate once it is available.
     
     while (curl -s -H "Authorization: Bearer $(gcloud auth print-access-token)" \
         -H "Content-Type: application/json" \
-    https://workstations.googleapis.com/v1alpha1/projects/${project}/locations/${region}/workstationClusters/${clusterid} | grep -q reconciling)
+    https://workstations.googleapis.com/v1alpha1/projects/${PROJECT_ID}/locations/${REGION}/workstationClusters/${CLUSTERID} | grep -q reconciling)
     do
         info " ... Still building ..."
         sleep 120
@@ -59,10 +55,10 @@ main() {
 }
 
 environment(){
-    info "Project: $project";
-    info "Region: $region";
-    info "Filename: $filename";
-    info "Clusterid: $clusterid";
+    info "Project: $PROJECT_ID";
+    info "Region: $REGION";
+    info "Filename: $FILENAME";
+    info "Clusterid: $CLUSTERID";
 }
 
 main "$@"
