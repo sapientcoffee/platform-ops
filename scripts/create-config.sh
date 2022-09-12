@@ -38,7 +38,7 @@ main() {
 
     curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
             -H "Content-Type: application/json" \
-                -d @${SETTINGS} \
+                -d @${CONFIG} \
             https://workstations.googleapis.com/v1beta/projects/${PROJECT_ID}/locations/${REGION}/workstationClusters/${CLUSTERID}/workstationConfigs?workstation_config_id=${CLUSTERID}
 
     info "Applying cluster configuration ..... please hold the line."
