@@ -65,3 +65,5 @@ mv extension /opt/code-oss/extensions/dart
 RUN wget https://open-vsx.org/api/Dart-Code/flutter/3.46.0/file/Dart-Code.flutter-3.46.0.vsix && \
 unzip vscjava.vscode-java-test-0.35.0.vsix "extension/*" &&\
 mv extension /opt/code-oss/extensions/flutter
+
+COPY settings.json /home/user/.config/Code/User/settings.json
