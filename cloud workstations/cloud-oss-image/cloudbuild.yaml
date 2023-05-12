@@ -1,0 +1,21 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    env:
+      - 'REGISTRY_URL=$_ARTIFACT_REGISTRY_BASE_URL'
+      - 'IMAGE_NAME=$_IMAGE_NAME'
+      - 'WORKSPACE_DIR=/workspace'
+    entrypoint: 'bash'
+    args:
+      - './build_image.sh'
+    dir: image
+  - name: 'gcr.io/cloud-builders/gcloud'
+    env:
+      - 'WORKSTATIONS_CONFIG_NAME=$_WORKSTATIONS_CONFIG_NAME'
+      - 'WORKSPACE_DIR=/workspace'
+    entrypoint: 'bash'
+    args:
+      - './update_config.sh'
+    dir: image
+
+options:
+  logging: CLOUD_LOGGING_ONLY

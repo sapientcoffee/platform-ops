@@ -1,18 +1,29 @@
-[![Edit directly in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/SapientCoffee/platform-ops.git)
-
-[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://shell.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/SapientCoffee/platform-ops.git&cloudshell_image=europe-west2-docker.pkg.dev/coffee-with-rob/espresso-gcp/espresso)
-
-# Platform Team Focus
+# Cloud Developer Workstations (Platform Team Focus)
 As we move more and more to remote development environments we need to have images to drive optimal experiance. This is a collection of image build to support remote development in environments like;
+* Google Cloud Workstations
 * Google Cloud Shell
 * GitPod
 * etc.
+
+Some are a bit dated now and more focus has been put into Google Cloud Workstations now that it has been moved to be generally available (GA).
 
 The following is a high-level overview of remote development in GCP using Cloud Shell and Cloud IDE;
 ![](Remote-Developer-Environment.jpg)
 
 
+## Google Cloud Workstaions
+A number of now legacy configurations exist in this repo that need to be tidied up, the latest configuration and examples for demos are stored in [Cloud Workstations](/cloud%20workstations/).
 
+
+
+
+
+
+
+
+
+
+# Legacy 
 ```
 export CUSTOM_ENV_REPO_ID="europe-west2-docker.pkg.dev/coffee-with-rob/espresso-gcp"
 export CUSTOM_ENV_PROJECT_ID="coffee-with-rob"

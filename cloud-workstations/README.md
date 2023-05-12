@@ -1,3 +1,5 @@
+# LEGACY METHOD THAT WAS USED DURING PREVIEW AND DEV STAGES
+
 ```
 export PROJECT="coffee-break-rob"
 export REGION="europe-west1"

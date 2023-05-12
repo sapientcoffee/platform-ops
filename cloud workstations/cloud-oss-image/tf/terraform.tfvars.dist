@@ -1,0 +1,5 @@
+gcp_project_id              = ""
+gcp_region                  = ""
+github_repo_owner           = ""
+github_repo_name            = ""
+workstations_config_name    = "projects/.../locations/.../workstationClusters/.../workstationConfigs/..."
