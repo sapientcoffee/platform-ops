@@ -10,6 +10,11 @@ USER root
 #     && apt-get install -y \
 #         apt-transport-https \
 
+RUN gcloud components update \
+     && gcloud components install alpha
+
+
+
 ################################
 # Install Firebase
 ################################
