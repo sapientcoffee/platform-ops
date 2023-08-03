@@ -5,7 +5,7 @@ The following is a sandbox for rapid experimentation and demo'ing of Google Clou
 
 ## Terraform 
 The initial setup leverages terraform to;
-* Create a new project
+<!-- * Create a new project -->
 * Create workstation cluster (~20 min to spinup)
 * Create basic workstaion configuration
   * Code OSS (Base Editor)

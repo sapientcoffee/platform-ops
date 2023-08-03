@@ -1,6 +1,6 @@
 terraform {
   backend "gcs" {
-    bucket  = "coffee-terraform"
+    bucket  = "morning-workstation"
     prefix  = "terraform/state/workstations"
   }
 }
