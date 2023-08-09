@@ -7,25 +7,6 @@ FROM us-central1-docker.pkg.dev/cloud-workstations-images/predefined/code-oss:la
 USER root
 
 ################################
-# Install Terraform
-################################
-
-# Download terraform for linux
-# RUN wget --progress=dot:mega https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
-
-# RUN \
-# 	# Unzip
-# 	unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
-# 	# Move to local bin
-# 	mv terraform /usr/local/bin/ && \
-# 	# Make it executable
-# 	chmod +x /usr/local/bin/terraform && \
-# 	# Check that it's installed
-# 	terraform --version
-
-# RUN echo 'alias tf=terraform' >> ~/.bashrc
-
-################################
 # Install Firebase
 ################################
 RUN curl -sL https://firebase.tools | bash

@@ -1,7 +1,7 @@
 steps:
 - name: 'gcr.io/kaniko-project/executor:latest'
   args: [
-    "--destination=europe-docker.pkg.dev/coffee-roaster-base/platform-ops/workspace:cloudworkstation",
+    "--destination=europe-docker.pkg.dev/coffee-plantation/workstation/codeoss",
     "--dockerfile=Dockerfile-workstations",
     "--cache=true",
     "--cache-ttl=24h"]
