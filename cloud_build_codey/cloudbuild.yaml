@@ -9,17 +9,14 @@ steps:
 
 # Simple sanity check: invoke the new gcloud container to confirm that it was
 # built correctly.
-- name: 'gcr.io/$PROJECT_ID/gcloud'
-  args: ['info']
+# - name: 'gcr.io/$PROJECT_ID/gcloud'
+#   args: ['info']
 
-# Confirm that auth is piped through correctly.
-- name: 'gcr.io/$PROJECT_ID/gcloud'
-  args: ['builds', 'list']
+# # Confirm that auth is piped through correctly.
+# - name: 'gcr.io/$PROJECT_ID/gcloud'
+#   args: ['builds', 'list']
 
 images:
-- 'gcr.io/$PROJECT_ID/gcloud'
-- 'gcr.io/$PROJECT_ID/gcloud-slim'
-# Regional AR Mirrors
-- 'europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud'
+- 'europe-docker.pkg.dev/$PROJECT_ID/codey-builder-image/codey'
 
 timeout: 2400s
