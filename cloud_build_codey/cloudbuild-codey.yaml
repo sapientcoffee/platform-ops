@@ -1,4 +1,9 @@
 steps:
+
+steps:
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  args: ['gcloud', 'info']
+
 - name: 'europe-docker.pkg.dev/coffee-and-codey/codey-builder-image/codey'
   args: ['gcloud', 'info']
 
