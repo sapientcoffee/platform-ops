@@ -1,0 +1,6 @@
+steps:
+- name: 'europe-docker.pkg.dev/coffee-and-codey/codey-builder-image/codey'
+  args: ['gcloud', 'source', 'repos', 'clone', 'default']
+
+- name: 'europe-docker.pkg.dev/coffee-and-codey/codey-builder-image/codey'
+  args: ['python codey.py']
