@@ -8,4 +8,4 @@ steps:
   args: ['gcloud', 'info']
 
 - name: 'europe-docker.pkg.dev/coffee-and-codey/codey-builder-image/codey'
-  args: ['python codey.py']
+  args: ['python /scripts/codey.py']
