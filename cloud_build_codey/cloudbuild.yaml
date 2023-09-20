@@ -2,9 +2,7 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--tag=gcr.io/$PROJECT_ID/gcloud'
-  # Regional AR Mirrors
-  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/ga/v1/gcloud'
+  - '--tag=europe-docker.pkg.dev/$PROJECT_ID/codey-builder-image/codey'
   - '-f'
   - 'Dockerfile'
   - '.'

@@ -33,3 +33,5 @@ RUN apt-get -y update && \
 
     # Clean up
     rm -rf /var/lib/apt/lists/*
+
+COPY codey.py /scripts/codey.py
