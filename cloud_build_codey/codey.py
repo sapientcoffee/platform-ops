@@ -53,11 +53,8 @@ def releasenotes(temperature: float = 0.5) -> object:
 
     return print("The generated release notes are: \n\n" + rnOutput)
 
-
 def write_a_function(temperature: float = 0.5) -> object:
-    """Example of using Code Chat Model to write a function."""
 
-    # TODO developer - override these parameters as needed:
     parameters = {
         "temperature": temperature,  # Temperature controls the degree of randomness in token selection.
         "max_output_tokens": 1024,  # Token limit determines the maximum amount of text output.
@@ -70,9 +67,35 @@ def write_a_function(temperature: float = 0.5) -> object:
         "Please help write a function to calculate the min of two numbers", **parameters
     )
     print(f"Response from Model: {response.text}")
-    # [END aiplatform_sdk_code_chat]
 
     return response
+
+def optimse(temperature: float = 0.5) -> object:
+
+    parameters = {
+        "temperature": temperature,  # Temperature controls the degree of randomness in token selection.
+        "max_output_tokens": 1024,  # Token limit determines the maximum amount of text output.
+    }
+
+    code_chat_model = CodeChatModel.from_pretrained("codechat-bison@001")
+    chat = code_chat_model.start_chat()
+
+    # Variable contains the path to the file
+    path = "./code.py"
+ 
+    # The file is read and its data is stored
+    data = open(path, 'r').read()
+ 
+    # Replacing all occurrences of newline in data with ''
+    data = data.replace('\n', '')
+    
+    # query = "Please help write detailed release notes for " + data
+    query = "Please optimze this code " + data
+
+    response = chat.send_message(query, **parameters)    
+    
+    suggestion = str(response)
+    return print("A possible optimsation is : \n\n" + suggestion)
 
 
 parser = argparse.ArgumentParser()
@@ -83,6 +106,12 @@ parser_documentation.set_defaults(func=documentation)
       
 parser_release_notes = subparsers.add_parser('release-notes', help='Generate Release notes')
 parser_release_notes.set_defaults(func=releasenotes)
+
+parser_release_notes = subparsers.add_parser('write-a-function', help='Generate a function')
+parser_release_notes.set_defaults(func=write_a_function)
+
+parser_release_notes = subparsers.add_parser('optimise', help='Look at code and suggest optimisation')
+parser_release_notes.set_defaults(func=optimse)
 
 if len(sys.argv) <= 1:
     sys.argv.append('--help')
