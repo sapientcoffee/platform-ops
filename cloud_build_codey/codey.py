@@ -32,14 +32,26 @@ def releasenotes(temperature: float = 0.5) -> object:
     code_chat_model = CodeChatModel.from_pretrained("codechat-bison@001")
     chat = code_chat_model.start_chat()
 
-    response = chat.send_message(
-        "Please help write release notes for def min(a, b): if a < b: return a else: return b", **parameters
-    )
-    print(f"Response from Model: {response.text}")
+    # Variable contains the path to the file
+    path = "./code.py"
+ 
+    # The file is read and its data is stored
+    data = open(path, 'r').read()
+ 
+    # Replacing all occurrences of newline in data with ''
+    data = data.replace('\n', '')
+    
+    query = "Write detailed release notes for " + data
 
-    # [END aiplatform_sdk_code_chat]
+    response = chat.send_message(query, **parameters)
 
-    return response
+    # print(f"Response from Model: {response.text}")
+    release_notes = open("release_notes.md", "w")
+    rnOutput = str(response)
+    release_notes.write(rnOutput)
+    release_notes.close()
+
+    return print("The generated release notes are: \n\n" + rnOutput)
 
 
 def write_a_function(temperature: float = 0.5) -> object:
