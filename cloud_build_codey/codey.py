@@ -5,7 +5,7 @@ from google.cloud import aiplatform
 from vertexai.preview.language_models import ChatModel, InputOutputTextPair
 from vertexai.preview.language_models import CodeChatModel
 
-def documentation():
+def documentation(temperature: float = 0.5) -> object:
     parameters = {
         "temperature": temperature,  # Temperature controls the degree of randomness in token selection.
         "max_output_tokens": 1024,  # Token limit determines the maximum amount of text output.
