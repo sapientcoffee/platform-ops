@@ -24,7 +24,6 @@ def documentation():
     return response
 
 def releasenotes(temperature: float = 0.5) -> object:
-
     parameters = {
         "temperature": temperature,  # Temperature controls the degree of randomness in token selection.
         "max_output_tokens": 1024,  # Token limit determines the maximum amount of text output.
