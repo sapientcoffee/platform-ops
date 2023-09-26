@@ -1,6 +1,5 @@
+DEPRICATED - please go to [https://gitlab.com/robedwards/coffee-and-codey.git](https://gitlab.com/robedwards/coffee-and-codey.git).
 
 
-```gcloud builds submit --config ./cloudbuild.yaml .```
-
-
+This is an early version and the latest is in the above repo.
 
