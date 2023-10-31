@@ -31,6 +31,12 @@ RUN curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/
 ################################
 RUN curl -sL https://firebase.tools | bash
 
+################################
+# Install Emulators
+################################
+RUN sudo apt-get install google-cloud-sdk-terraform-tools
+RUN sudo apt-get install google-cloud-sdk-config-connector
+
 # bashrc config
 RUN echo 'alias tf=terraform' >> ~/.bashrc
 RUN echo 'alias ll="ls -lrt"' >> ~/.bashrc
