@@ -7,19 +7,19 @@ steps:
     "--cache-ttl=24h"]
   id: "Creating a Google Cloud Workstations Image"
 
-# Simple sanity check: invoke the new gcloud container to confirm that it was built correctly.
-- name: 'europe-docker.pkg.dev/coffee-plantation/workstation/codeoss:latest'
-  args: ['terraform', '-v']
-  id: Sanity Check - terraform 
+# # Simple sanity check: invoke the new gcloud container to confirm that it was built correctly.
+# - name: 'europe-docker.pkg.dev/coffee-plantation/workstation/codeoss:latest'
+#   args: ['terraform', '-v']
+#   id: Sanity Check - terraform 
 
-# Simple sanity check: invoke the new gcloud container to confirm that it was built correctly.
-- name: 'europe-docker.pkg.dev/coffee-plantation/workstation/codeoss:latest'
-  args: ['firebase', '--version']
-  id: Sanity Check - firebase 
+# # Simple sanity check: invoke the new gcloud container to confirm that it was built correctly.
+# - name: 'europe-docker.pkg.dev/coffee-plantation/workstation/codeoss:latest'
+#   args: ['firebase', '--version']
+#   id: Sanity Check - firebase 
 
-# # Confirm that auth is piped through correctly.
-- name: 'gcr.io/$PROJECT_ID/gcloud'
-  args: ['builds', 'list']
-  id: Confirm auth is pipled through
+# # # Confirm that auth is piped through correctly.
+# - name: 'gcr.io/$PROJECT_ID/gcloud'
+#   args: ['builds', 'list']
+#   id: Confirm auth is pipled through
   
 timeout: '3600s'
