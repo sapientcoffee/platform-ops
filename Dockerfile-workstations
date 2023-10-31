@@ -1,7 +1,6 @@
 
-# us-central1-docker.pkg.dev/cloud-workstations-images/predefined/basic:latest
 FROM us-central1-docker.pkg.dev/cloud-workstations-images/predefined/code-oss:latest
-ARG TERRAFORM_VERSION=1.5.5
+ARG TERRAFORM_VERSION=1.6.2
 
 # Install                                                                                                            
 USER root
