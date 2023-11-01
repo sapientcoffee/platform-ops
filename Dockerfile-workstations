@@ -44,8 +44,8 @@ RUN sudo apt-get install google-cloud-sdk-config-connector && echo "installed gc
 RUN curl -sfL https://direnv.net/install.sh | bash
 RUN apt install -y zsh && echo "installed zsh"
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended && echo "installed oh-my-zsh"
-RUN git clone https://github.com/romkatv/powerlevel10k.git /home/user/.oh-my-zsh/custom/themes/powerlevel10k && echo "installed powerlevel10k theme for zsh"
-COPY zshrc /home/user/.zshrc
+# RUN git clone https://github.com/romkatv/powerlevel10k.git /home/user/.oh-my-zsh/custom/themes/powerlevel10k && echo "installed powerlevel10k theme for zsh"
+# COPY zshrc /home/user/.zshrc
 
 # bashrc config
 RUN echo 'alias tf=terraform' >> ~/.bashrc
@@ -54,46 +54,12 @@ RUN echo 'alias ll="ls -lrt"' >> ~/.bashrc
 # Give back control
 USER root
 
-# https://open-vsx.org/
-# RUN wget https://open-vsx.org/api/vscjava/vscode-java-debug/0.40.1/file/vscjava.vscode-java-debug-0.40.1.vsix && \
-# unzip vscjava.vscode-java-debug-0.40.1.vsix "extension/*" &&\
-# mv extension /opt/code-oss/extensions/java-debug
- 
-# RUN wget https://open-vsx.org/api/vscjava/vscode-java-dependency/0.19.1/file/vscjava.vscode-java-dependency-0.19.1.vsix && \
-# unzip vscjava.vscode-java-dependency-0.19.1.vsix "extension/*" &&\
-# mv extension /opt/code-oss/extensions/java-dependency
- 
-# RUN wget https://open-vsx.org/api/redhat/java/1.6.0/file/redhat.java-1.6.0.vsix && \
-# unzip redhat.java-1.6.0.vsix "extension/*" &&\
-# mv extension /opt/code-oss/extensions/redhat-java
- 
-# RUN wget https://open-vsx.org/api/vscjava/vscode-maven/0.35.2/file/vscjava.vscode-maven-0.35.2.vsix && \
-# unzip vscjava.vscode-maven-0.35.2.vsix "extension/*" &&\
-# mv extension /opt/code-oss/extensions/java-maven
- 
-# RUN wget https://open-vsx.org/api/vscjava/vscode-java-test/0.35.0/file/vscjava.vscode-java-test-0.35.0.vsix && \
-# unzip vscjava.vscode-java-test-0.35.0.vsix "extension/*" &&\
-# mv extension /opt/code-oss/extensions/java-test
-
-# RUN wget https://open-vsx.org/api/vscjava/vscode-java-test/0.35.0/file/vscjava.vscode-java-test-0.35.0.vsix && \
-# unzip vscjava.vscode-java-test-0.35.0.vsix "extension/*" &&\
-# mv extension /opt/code-oss/extensions/java-test
-
 RUN wget https://open-vsx.org/api/hashicorp/terraform/linux-x64/2.28.2/file/hashicorp.terraform-2.28.2@linux-x64.vsix  && \
 unzip hashicorp.terraform-2.28.2@linux-x64.vsix "extension/*" &&\
 mv extension /opt/code-oss/extensions/terraform
 
-# RUN wget https://open-vsx.org/api/Dart-Code/dart-code/3.46.0/file/Dart-Code.dart-code-3.46.0.vsix && \
-# unzip vscjava.vscode-java-test-0.35.0.vsix "extension/*" &&\
-# mv extension /opt/code-oss/extensions/dart
-
-# RUN wget https://open-vsx.org/api/Dart-Code/flutter/3.46.0/file/Dart-Code.flutter-3.46.0.vsix && \
-# unzip vscjava.vscode-java-test-0.35.0.vsix "extension/*" &&\
-# mv extension /opt/code-oss/extensions/flutter
-
-
 RUN sudo mkdir -p /sapientcoffee/settings
 COPY settings.json /sapientcoffee/settings/settings.json
-# COPY customisation.sh /etc/workstation-startup.d/030_customise.sh
-# RUN sudo chmod +x /etc/workstation-startup.d/030_customise.sh
+COPY customisation.sh /etc/workstation-startup.d/030_customise.sh
+RUN sudo chmod +x /etc/workstation-startup.d/030_customise.sh
 
