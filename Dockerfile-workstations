@@ -83,12 +83,12 @@ RUN wget https://open-vsx.org/api/hashicorp/terraform/linux-x64/2.28.2/file/hash
 unzip hashicorp.terraform-2.28.2@linux-x64.vsix "extension/*" &&\
 mv extension /opt/code-oss/extensions/terraform
 
-RUN wget https://open-vsx.org/api/Dart-Code/dart-code/3.46.0/file/Dart-Code.dart-code-3.46.0.vsix && \
-unzip vscjava.vscode-java-test-0.35.0.vsix "extension/*" &&\
-mv extension /opt/code-oss/extensions/dart
+# RUN wget https://open-vsx.org/api/Dart-Code/dart-code/3.46.0/file/Dart-Code.dart-code-3.46.0.vsix && \
+# unzip vscjava.vscode-java-test-0.35.0.vsix "extension/*" &&\
+# mv extension /opt/code-oss/extensions/dart
 
-RUN wget https://open-vsx.org/api/Dart-Code/flutter/3.46.0/file/Dart-Code.flutter-3.46.0.vsix && \
-unzip vscjava.vscode-java-test-0.35.0.vsix "extension/*" &&\
-mv extension /opt/code-oss/extensions/flutter
+# RUN wget https://open-vsx.org/api/Dart-Code/flutter/3.46.0/file/Dart-Code.flutter-3.46.0.vsix && \
+# unzip vscjava.vscode-java-test-0.35.0.vsix "extension/*" &&\
+# mv extension /opt/code-oss/extensions/flutter
 
 COPY settings.json /home/user/.config/Code/User/settings.json
