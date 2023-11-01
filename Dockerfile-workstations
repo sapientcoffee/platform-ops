@@ -41,9 +41,10 @@ RUN sudo apt-get install google-cloud-sdk-config-connector && echo "installed gc
 ################################
 # Setup terminal
 ################################
+RUN curl -sfL https://direnv.net/install.sh | bash
 RUN apt install -y zsh && echo "installed zsh"
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended && echo "installed oh-my-zsh"
-RUN git clone https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k && echo "installed powerlevel10k theme for zsh"
+RUN git clone https://github.com/romkatv/powerlevel10k.git /home/user/.oh-my-zsh/custom/themes/powerlevel10k && echo "installed powerlevel10k theme for zsh"
 COPY zshrc /home/user/.zshrc
 
 # bashrc config
