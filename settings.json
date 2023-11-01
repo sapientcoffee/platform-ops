@@ -1,5 +1,8 @@
 {
     "editor.fontFamily": "'Droid Sans Mono', 'monospace', monospace",
     "editor.fontWeight": "normal",
-    "workbench.colorTheme": "Code OSS Dark"
+    "workbench.colorTheme": "Monokai Dimmed",
+    "cloudcode.duetAI.enable": true,
+    "cloudcode.duetAI.enableChat": true,
+    "cloudcode.duetAI.inlineSuggestions.enableAuto": true
 }

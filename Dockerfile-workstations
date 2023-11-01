@@ -91,4 +91,9 @@ mv extension /opt/code-oss/extensions/terraform
 # unzip vscjava.vscode-java-test-0.35.0.vsix "extension/*" &&\
 # mv extension /opt/code-oss/extensions/flutter
 
-COPY settings.json /home/user/.config/Code/User/settings.json
+
+RUN sudo mkdir -p /sapientcoffee/settings
+COPY settings.json /sapientcoffee/settings/settings.json
+COPY customisation.sh /etc/workstation-startup.d/030_customise.sh
+RUN sudo chmod +x /etc/workstation-startup.d/030_customise.sh
+
