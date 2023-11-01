@@ -2,7 +2,11 @@
     "editor.fontFamily": "'Droid Sans Mono', 'monospace', monospace",
     "editor.fontWeight": "normal",
     "workbench.colorTheme": "Monokai Dimmed",
+    "files.autoSave": "onFocusChange",
     "cloudcode.duetAI.enable": true,
     "cloudcode.duetAI.enableChat": true,
-    "cloudcode.duetAI.inlineSuggestions.enableAuto": true
+    "cloudcode.duetAI.inlineSuggestions.enableAuto": true,
+    "interactiveWindow.restore": true,
+    "workbench.editor.sharedViewState": true,
+    "terminal.integrated.fontFamily": "MesloLGS NF"
 }
