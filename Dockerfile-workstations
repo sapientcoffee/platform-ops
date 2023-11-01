@@ -94,6 +94,6 @@ mv extension /opt/code-oss/extensions/terraform
 
 RUN sudo mkdir -p /sapientcoffee/settings
 COPY settings.json /sapientcoffee/settings/settings.json
-COPY customisation.sh /etc/workstation-startup.d/030_customise.sh
-RUN sudo chmod +x /etc/workstation-startup.d/030_customise.sh
+# COPY customisation.sh /etc/workstation-startup.d/030_customise.sh
+# RUN sudo chmod +x /etc/workstation-startup.d/030_customise.sh
 
