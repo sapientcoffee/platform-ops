@@ -3,7 +3,7 @@ FROM us-central1-docker.pkg.dev/cloud-workstations-images/predefined/code-oss:la
 ARG TERRAFORM_VERSION=1.6.2
 
 # Install                                                                                                            
-USER root
+# USER root
 
 ################################
 # Install Terraform
@@ -49,19 +49,19 @@ COPY zshrc /sapientcoffee/settings/zshrc
 
 
 # Give back control
-USER root
+# USER root
 
 RUN wget https://open-vsx.org/api/hashicorp/terraform/linux-x64/2.28.2/file/hashicorp.terraform-2.28.2@linux-x64.vsix  && \
 unzip hashicorp.terraform-2.28.2@linux-x64.vsix "extension/*" &&\
 mv extension /opt/code-oss/extensions/terraform
 
-RUN sudo mkdir -p /sapientcoffee/settings && mkdir -p /sapientcoffee/scripts
-COPY settings.json /sapientcoffee/settings/settings.json
-COPY custom.sh /etc/workstation-startup.d/011_custom.sh
-RUN sudo chmod +x /etc/workstation-startup.d/011_custom.sh
-COPY custom.sh /sapientcoffee/scripts/custom.sh
-RUN sudo chmod +x /sapientcoffee/scripts/custom.sh
-RUN date >/sapientcoffee/scripts/version
+# RUN sudo mkdir -p /sapientcoffee/settings && mkdir -p /sapientcoffee/scripts
+# COPY settings.json /sapientcoffee/settings/settings.json
+COPY custom.sh /etc/workstation-startup.d/110_custom.sh
+RUN sudo chmod +x /etc/workstation-startup.d/110_custom.sh
+# COPY custom.sh /sapientcoffee/scripts/custom.sh
+# RUN sudo chmod +x /sapientcoffee/scripts/custom.sh
+# RUN date >/sapientcoffee/scripts/version
  
 
 # bashrc config
