@@ -46,9 +46,7 @@ RUN apt install -y zsh && echo "installed zsh"
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended && echo "installed oh-my-zsh"
 COPY zshrc /sapientcoffee/settings/zshrc
 
-# bashrc config
-RUN echo 'alias tf=terraform' >> ~/.bashrc
-RUN echo 'alias ll="ls -lrt"' >> ~/.bashrc
+
 
 # Give back control
 USER root
@@ -59,6 +57,14 @@ mv extension /opt/code-oss/extensions/terraform
 
 RUN sudo mkdir -p /sapientcoffee/settings
 COPY settings.json /sapientcoffee/settings/settings.json
-COPY custom.sh /etc/workstation-startup.d/011_custom.sh
-RUN sudo chmod +x /etc/workstation-startup.d/011_custom.sh
+# COPY custom.sh /etc/workstation-startup.d/011_custom.sh
+# RUN sudo chmod +x /etc/workstation-startup.d/011_custom.sh
+COPY custom.sh /sapientcoffee/settings/custom.sh
+RUN sudo chmod +x /sapientcoffee/settings/custom.sh
+
+# bashrc config
+RUN echo 'alias tf=terraform' >> ~/.bashrc
+RUN echo 'alias ll="ls -lrt"' >> ~/.bashrc
+RUN echo '[ -f /.sapientcoffee/setup_compete ]' >> ~/.bashrc
+RUN echo '/sapientcoffee/settings/custom.sh"' >> ~/.bashrc
 
