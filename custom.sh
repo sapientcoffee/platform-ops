@@ -1,5 +1,5 @@
 #!/bin/sh
-runuser user -c "export TEST_VAR=rob"
+runuser user -c "touch ~/.rob"
 # runuser user -c -l "cp /sapientcoffee/settings/settings.json $HOME/.codeoss-cloudworkstations/data/Machine/"
 
 

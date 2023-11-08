@@ -57,11 +57,11 @@ mv extension /opt/code-oss/extensions/terraform
 
 # RUN sudo mkdir -p /sapientcoffee/settings && mkdir -p /sapientcoffee/scripts
 # COPY settings.json /sapientcoffee/settings/settings.json
-COPY custom.sh /etc/workstation-startup.d/110_custom.sh
-RUN sudo chmod +x /etc/workstation-startup.d/110_custom.sh
+COPY custom.sh /etc/workstation-startup.d/200_custom.sh
+RUN chmod +x /etc/workstation-startup.d/200_custom.sh
 # COPY custom.sh /sapientcoffee/scripts/custom.sh
 # RUN sudo chmod +x /sapientcoffee/scripts/custom.sh
-# RUN date >/sapientcoffee/scripts/version
+RUN date >/sapientcoffee/scripts/version
  
 
 # bashrc config
