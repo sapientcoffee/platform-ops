@@ -55,16 +55,18 @@ RUN wget https://open-vsx.org/api/hashicorp/terraform/linux-x64/2.28.2/file/hash
 unzip hashicorp.terraform-2.28.2@linux-x64.vsix "extension/*" &&\
 mv extension /opt/code-oss/extensions/terraform
 
-RUN sudo mkdir -p /sapientcoffee/settings
+RUN sudo mkdir -p /sapientcoffee/settings && mkdir -p /sapientcoffee/scripts
 COPY settings.json /sapientcoffee/settings/settings.json
 # COPY custom.sh /etc/workstation-startup.d/011_custom.sh
 # RUN sudo chmod +x /etc/workstation-startup.d/011_custom.sh
-COPY custom.sh /sapientcoffee/settings/custom.sh
-RUN sudo chmod +x /sapientcoffee/settings/custom.sh
+COPY custom.sh /sapientcoffee/scripts/custom.sh
+RUN sudo chmod +x /sapientcoffee/scripts/custom.sh
+RUN date >/sapientcoffee/scripts/version
+ 
 
 # bashrc config
 RUN echo 'alias tf=terraform' >> ~/.bashrc
 RUN echo 'alias ll="ls -lrt"' >> ~/.bashrc
-RUN echo '[ -f /.sapientcoffee/setup_compete ]' >> ~/.bashrc
-RUN echo '/sapientcoffee/settings/custom.sh"' >> ~/.bashrc
+RUN echo 'if [ ! -f /.sapientcoffee/setup_compete ]; then /sapientcoffee/scripts/custom.sh' >> ~/.bashrc
+# RUN echo '/sapientcoffee/settings/custom.sh"' >> ~/.bashrc
 
