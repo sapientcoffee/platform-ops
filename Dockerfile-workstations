@@ -65,8 +65,8 @@ RUN date >/sapientcoffee/scripts/version
  
 
 # bashrc config
-RUN runuser user -c -l "echo 'alias bob=terraform' >> ~/.bashrc"
-RUN echo 'alias ll="ls -lrt"' >> ~/.bashrc
+# RUN runuser user -c -l "echo 'alias bob=terraform' >> ~/.bashrc"
+# RUN echo 'alias ll="ls -lrt"' >> ~/.bashrc
 # RUN runuser user -c -l "echo 'if [ ! -f /.sapientcoffee/setup_compete ]; then /sapientcoffee/scripts/custom.sh' >> ~/.bashrc"
 # RUN echo '/sapientcoffee/settings/custom.sh"' >> ~/.bashrc
 
