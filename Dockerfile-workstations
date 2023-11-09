@@ -2,7 +2,8 @@
 FROM us-central1-docker.pkg.dev/cloud-workstations-images/predefined/code-oss:latest
 ARG TERRAFORM_VERSION=1.6.2
 
-# Download terraform for linux
+# Install tooling
+## terraform
 RUN wget --progress=dot:mega https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
 
 RUN \
@@ -16,39 +17,32 @@ RUN \
 	terraform --version && \
 	echo "installed terraform"
 
-# Install Kustomize
+## Kustomize
 RUN curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash && echo "installed kustomize"
 
 
-################################
-# Install Firebase
-################################
+## Firebase CLI
 RUN curl -sL https://firebase.tools | bash && echo "installed firebase CLI"
 
-################################
-# Install gcloud additions
-################################
-RUN sudo apt-get install google-cloud-sdk-terraform-tools && echo "installed gcloud terrafrom tools"
+## gcloud addons
+RUN sudo apt-get install google-cloud-sdk-terraform-tools && echo "installed gcloud terrafrom tools" && \
 RUN sudo apt-get install google-cloud-sdk-config-connector && echo "installed gcloud config-connector"
 
-################################
-# Setup terminal
-################################
-# RUN curl -sfL https://direnv.net/install.sh | bash
+## zsh
 RUN apt install -y zsh && echo "installed zsh"
-# RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended && echo "installed oh-my-zsh"
 
-COPY zshrc /sapientcoffee/settings/zshrc
-
+# Install Code OSS Plugins (from open-vsx.org)
 RUN wget https://open-vsx.org/api/hashicorp/terraform/linux-x64/2.28.2/file/hashicorp.terraform-2.28.2@linux-x64.vsix  && \
 unzip hashicorp.terraform-2.28.2@linux-x64.vsix "extension/*" &&\
 mv extension /opt/code-oss/extensions/terraform
 
+# Customisation of terminal (zsh, themes and layout)
 RUN mkdir -p /sapientcoffee/settings && mkdir -p /sapientcoffee/scripts
-COPY settings.json /sapientcoffee/settings/settings.json
-COPY p10k.zsh /sapientcoffee/settings/.p10k.zsh
+COPY settings.json p10k.zsh zshrc /sapientcoffee/settings/
 COPY custom.sh /etc/workstation-startup.d/200_custom.sh
-RUN chmod +x /etc/workstation-startup.d/200_custom.sh
 COPY custom.sh /sapientcoffee/scripts/custom.sh
-RUN chmod +x /sapientcoffee/scripts/custom.sh
-RUN date >/sapientcoffee/scripts/version
+RUN chmod +x /etc/workstation-startup.d/200_custom.sh /sapientcoffee/scripts/custom.sh && \
+	date >/sapientcoffee/scripts/version
+
+
+
