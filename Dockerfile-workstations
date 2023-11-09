@@ -25,7 +25,7 @@ RUN curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/
 RUN curl -sL https://firebase.tools | bash && echo "installed firebase CLI"
 
 ## gcloud addons
-RUN sudo apt-get install google-cloud-sdk-terraform-tools && echo "installed gcloud terrafrom tools" && \
+RUN sudo apt-get install google-cloud-sdk-terraform-tools && echo "installed gcloud terrafrom tools" 
 RUN sudo apt-get install google-cloud-sdk-config-connector && echo "installed gcloud config-connector"
 
 ## zsh
