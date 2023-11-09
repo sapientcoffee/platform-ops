@@ -21,5 +21,5 @@ runuser user -c 'cp /sapientcoffee/settings/zshrc /home/user/.zshrc'
 runuser user -c 'cp /sapientcoffee/settings/.p10k.zsh /home/user/'
 
 echo 'set zsh as default'
-runuser user -c 'echo 'exec zsh' >> /home/user/.bashrc'
+runuser user -c 'echo "exec zsh" >> /home/user/.bashrc'
 
