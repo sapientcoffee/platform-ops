@@ -37,7 +37,7 @@ unzip hashicorp.terraform-2.28.2@linux-x64.vsix "extension/*" &&\
 mv extension /opt/code-oss/extensions/terraform
 
 # Customisation of terminal (zsh, themes and layout)
-RUN mkdir -p /sapientcoffee/settings && mkdir -p /sapientcoffee/scripts
+RUN mkdir -p /sapientcoffee/settings /sapientcoffee/scripts /home/user/workspace
 COPY settings.json p10k.zsh zshrc /sapientcoffee/settings/
 COPY custom.sh /etc/workstation-startup.d/200_custom.sh
 COPY custom.sh /sapientcoffee/scripts/custom.sh
