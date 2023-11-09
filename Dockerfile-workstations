@@ -37,7 +37,8 @@ RUN sudo apt-get install google-cloud-sdk-config-connector && echo "installed gc
 # RUN curl -sfL https://direnv.net/install.sh | bash
 RUN apt install -y zsh && echo "installed zsh"
 # RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended && echo "installed oh-my-zsh"
-# COPY zshrc /sapientcoffee/settings/zshrc
+
+COPY zshrc /sapientcoffee/settings/zshrc
 
 RUN wget https://open-vsx.org/api/hashicorp/terraform/linux-x64/2.28.2/file/hashicorp.terraform-2.28.2@linux-x64.vsix  && \
 unzip hashicorp.terraform-2.28.2@linux-x64.vsix "extension/*" &&\
