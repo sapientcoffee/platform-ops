@@ -47,16 +47,8 @@ mv extension /opt/code-oss/extensions/terraform
 RUN mkdir -p /sapientcoffee/settings && mkdir -p /sapientcoffee/scripts
 COPY settings.json /sapientcoffee/settings/settings.json
 COPY p10k.zsh /sapientcoffee/settings/.p10k.zsh
-# COPY custom.sh /etc/workstation-startup.d/200_custom.sh
-# RUN chmod +x /etc/workstation-startup.d/200_custom.sh
+COPY custom.sh /etc/workstation-startup.d/200_custom.sh
+RUN chmod +x /etc/workstation-startup.d/200_custom.sh
 COPY custom.sh /sapientcoffee/scripts/custom.sh
 RUN chmod +x /sapientcoffee/scripts/custom.sh
 RUN date >/sapientcoffee/scripts/version
- 
-
-# bashrc config
-# RUN runuser user -c -l "echo 'alias bob=terraform' >> ~/.bashrc"
-# RUN echo 'alias ll="ls -lrt"' >> ~/.bashrc
-# RUN runuser user -c -l "echo 'if [ ! -f /.sapientcoffee/setup_compete ]; then /sapientcoffee/scripts/custom.sh' >> ~/.bashrc"
-# RUN echo '/sapientcoffee/settings/custom.sh"' >> ~/.bashrc
-
