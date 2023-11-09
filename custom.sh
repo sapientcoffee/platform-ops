@@ -16,10 +16,10 @@ runuser user -c 'git clone https://github.com/romkatv/powerlevel10k.git /home/us
 
 echo 'Copy IDE settings and terminal settings'
 runuser user -c 'cp /sapientcoffee/settings/settings.json /home/user/.codeoss-cloudworkstations/data/Machine/'
-runuser user -c 'cp /sapientcoffee/settings/.p10k.zsh /home/user/'
+runuser user -c 'cp /sapientcoffee/settings/p10k.zsh /home/user/'
 runuser user -c 'cp /sapientcoffee/settings/zshrc /home/user/.zshrc'
-runuser user -c 'cp /sapientcoffee/settings/.p10k.zsh /home/user/'
 
 echo 'set zsh as default'
+runuser user -c 'echo rob test >> /home/user/.bashrc'
 runuser user -c 'echo "exec zsh" >> /home/user/.bashrc'
 
