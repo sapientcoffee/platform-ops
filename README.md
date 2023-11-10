@@ -1,64 +1,44 @@
-# Cloud Developer Workstations (Platform Team Focus)
-As we move more and more to remote development environments we need to have images to drive optimal experiance. This is a collection of image build to support remote development in environments like;
-* Google Cloud Workstations
-* Google Cloud Shell
-* GitPod
-* etc.
+# Platform Operations
+Building a collection of examples that platfrom engineering teams could leverage to help with solving user challenges on Google Cloud.
 
-Some are a bit dated now and more focus has been put into Google Cloud Workstations now that it has been moved to be generally available (GA).
+## Cloud Developer Workstations
+Cloud Developer Environments (CDE) can be useful tool to help developers get things done, the option on Google Cloud is [Cloud Workstations](https://cloud.google.com/workstations). They can help solve common challenges that sap the time of development teams, things like environment setup (onboarding, cost of hig-end machines, say GPU's), security and exflitration guardrails (contole location of stored source code, securing of workstations) and productivity (accessing resources inside private networks, build times, complex artifacts). 
 
-The following is a high-level overview of remote development in GCP using Cloud Shell and Cloud IDE;
+Two personas that emerge are;
+* Admins/platfrom engineers (manage environments and provide access to developers including security polices and secure images)
+* Developers (consumer of on-demand, pre-configured environemens that can be access anywhere a browser is available)
+
+Over the years the capabilities and offerings have grown on Google Cloud
+* 2016 -> Cloud Shell (Online pre-configured dev environment and terminal with basic code editor)
+* 2019 -> [Cloud Code](https://cloud.google.com/code) (Plugins for IntelliJ and VSCode, automation and assistance in the IDE)
+* 2020 -> [Cloud Shell Editor](https://cloud.google.com/shell) (Updated IDE with source control, debugger and emulators including enabling quick exploration of cloud services)
+* 2023 -> [Cloud Workstations](https://cloud.google.com/workstations)
+* 2023 -> [Project IDX](https://developers.google.com/idx) (part of a wider Google experimental new initiative aimed at bringing your entire full-stack, multiplatform app development workflow to the cloud)
+
+So what is the differece between Cloud Shell and Cloud Workstations?
+* Cloud Shell (onboarding/learning focused)
+  * Pre-configured environment
+  * Focus on simple onboarding tasks
+  * Integrated with GCP dev tools
+  * Accessible from the browser
+  * Free, requires no project
+  * 5GB of persistent disk
+* Cloud Workstations (enterprise grade)
+  * Fully customisable environment
+  * Full fledged IDE/Dev Environment (choice of IDE)
+  * Integrated with GCP dev tools
+  * Accessible via browser/SSH/Local IDE
+  * Runs on customer owned VMs/Disks
+  * Support for VPC and security policies
+
+
+The following is a high-level overview of remote development in GCP using Cloud Shell and Cloud IDE (need to update for Cloud Workstations);
 ![](Remote-Developer-Environment.jpg)
 
 
-## Google Cloud Workstaions
-A number of now legacy configurations exist in this repo that need to be tidied up, the latest configuration and examples for demos are stored in [Cloud Workstations](/cloud%20workstations/).
+### Google Cloud Workstaions
+Configuration examples and demos are in the [CloudWorkstations](CloudWorkstations/) folder.
 
+### Cloud Shell
+Configuration examples and demos are in the [CloudShell](CloudShell/) folder.
 
-
-
-
-
-
-
-
-
-# Legacy 
-```
-export CUSTOM_ENV_REPO_ID="europe-west2-docker.pkg.dev/coffee-with-rob/espresso-gcp"
-export CUSTOM_ENV_PROJECT_ID="coffee-with-rob"
-```
-
-```
-cloudshell env build-local
-cloudshell env run
-```
-
-
-```
-gcloud builds submit --tag \
-    <image>:<tag1>
-```
-
-Creating a trigger for Github
-
-
-```
-gcloud beta builds triggers create github \
-    --repo-name=REPO_NAME \
-    --repo-owner=REPO_OWNER \
-    --branch-pattern=BRANCH_PATTERN \ # or --tag-pattern=TAG_PATTERN
-    --build-config=BUILD_CONFIG_FILE \
-    --service-account=SERVICE_ACCOUNT \
-    --require-approval
-
-```
-
-
-TODO
-* Cloud Build with TF
-* Investigate Cloud Build with KCC
-* Trigger based on base conatiner image
-* Trigger on apt/debendency changes
-* Tutorial Page for this and it to autolaunch with click
-* Have two OICS 1) Edit 2) Learn
