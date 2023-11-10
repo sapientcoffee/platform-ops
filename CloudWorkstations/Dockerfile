@@ -38,7 +38,7 @@ mv extension /opt/code-oss/extensions/terraform
 
 # Customisation of terminal (zsh, themes and layout)
 RUN mkdir -p /sapientcoffee/settings /sapientcoffee/scripts 
-COPY CloudWorkstations/settings.json p10k.zsh zshrc /sapientcoffee/settings/
+COPY CloudWorkstations/settings.json CloudWorkstations/p10k.zsh CloudWorkstations/zshrc /sapientcoffee/settings/
 COPY CloudWorkstations/custom.sh /etc/workstation-startup.d/200_custom.sh
 COPY CloudWorkstations/custom.sh /sapientcoffee/scripts/custom.sh
 RUN chmod +x /etc/workstation-startup.d/200_custom.sh /sapientcoffee/scripts/custom.sh && \
