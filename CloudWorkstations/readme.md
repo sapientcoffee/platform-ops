@@ -26,6 +26,108 @@ To get started with Cloud Workstations, you can:
 * Clone the CloudWorkstations repository to your local machine.
 * <insert instructions here>
 
+### Admin Persona
+
+#### Create a cluster
+A workstation cluster holds all the workstations and workstation configs, it also defines which VPC your workstations will be created in. 
+* create a file called cluster.json* describing the cluster you want to create 
+
+```json
+{
+"network": "projects/your-project/global/networks/default",
+"subnetwork": "projects/your-project/regions/us-central1/subnetworks/default"
+}
+
+```
+
+```
+export PROJECT=your-project #This is the project id
+```
+
+```
+curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+ -H "Content-Type: application/json" \
+ -d @cluster.json \
+"https://workstations.googleapis.com/v1beta/projects/${PROJECT}/locations/us-central1/workstationClusters?workstation_cluster_id=my-cluster"
+
+
+```
+
+Check its running
+```
+curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+ -H "Content-Type: application/json" \
+"https://workstations.googleapis.com/v1beta/projects/${PROJECT}/locations/us-central1/workstationClusters/my-cluster"
+
+```
+#### Create a workstation
+
+config.json
+```
+{
+"idleTimeout": "7200s",
+"host": {
+"gce_instance": {
+"machine_type": "e2-standard-8",
+"pool_size": 1
+}
+},
+"persistentDirectories": [
+{
+"mountPath": "/home",
+"gcePd": {
+"sizeGb": 200,
+"fsType": "ext4"
+}
+}
+]
+}
+
+```
+
+Create the config
+```
+curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+ -H "Content-Type: application/json" \
+ -d @config.json \
+"https://workstations.googleapis.com/v1beta/projects/${PROJECT}/locations/us-central1/workstationClusters/my-cluster/workstationConfigs?workstation_config_id=my-config"
+
+```
+
+Check its running -> `reconciling: true` is a good sign
+```
+curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+ -H "Content-Type: application/json" \
+"https://workstations.googleapis.com/v1beta/projects/${PROJECT}/locations/us-central1/workstationClusters/my-cluster/workstationConfigs/my-config"
+
+```
+
+### xyz Persona
+
+build container image
+
+test image
+
+`docker run -p 8080:80 gcr.io/cloud-workstations-external/mycustomimage:latest`
+
+
+### Developer Persona
+
+#### SSH Access
+
+Create a tunnel 
+```
+gcloud alpha workstations start-tcp-tunnel --project=${PROJECT} --region=us-central1 --cluster=my-cluster --config=my-config my-workstation 22 --local-host-port=:2222
+
+```
+
+`ssh user@localhost -p 2222` or `ssh user@127.0.0.1 -p 2222`
+
+`gcloud workstations ssh`
+
+"Remote - SSH" Plugin on local IDE
+
+
 ## Contributing
 If you would like to contribute to the CloudWorkstations repository, you can:
 
