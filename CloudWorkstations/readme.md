@@ -21,7 +21,6 @@ The CloudWorkstations directory contains the following files and directories:
 
 ## Getting Started
 To get started with Cloud Workstations, you can:
-
 * Visit the [Cloud Workstations documentation](https://cloud.google.com/workstations/docs/).
 * Clone the CloudWorkstations repository to your local machine.
 * <insert instructions here>
@@ -34,27 +33,25 @@ A workstation cluster holds all the workstations and workstation configs, it als
 
 ```json
 {
-"network": "projects/your-project/global/networks/default",
-"subnetwork": "projects/your-project/regions/us-central1/subnetworks/default"
+  "network": "projects/your-project/global/networks/default",
+  "subnetwork": "projects/your-project/regions/us-central1/subnetworks/default"
 }
-
 ```
 
-```
+```bash
 export PROJECT=your-project #This is the project id
 ```
 
-```
+```bash
 curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
  -H "Content-Type: application/json" \
  -d @cluster.json \
 "https://workstations.googleapis.com/v1beta/projects/${PROJECT}/locations/us-central1/workstationClusters?workstation_cluster_id=my-cluster"
-
-
 ```
 
 Check its running
-```
+
+```bash
 curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
  -H "Content-Type: application/json" \
 "https://workstations.googleapis.com/v1beta/projects/${PROJECT}/locations/us-central1/workstationClusters/my-cluster"
@@ -63,30 +60,29 @@ curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
 #### Create a workstation
 
 config.json
-```
+```json
 {
-"idleTimeout": "7200s",
-"host": {
-"gce_instance": {
-"machine_type": "e2-standard-8",
-"pool_size": 1
+  "idleTimeout": "7200s",
+  "host": {
+    "gce_instance": {
+      "machine_type": "e2-standard-8",
+      "pool_size": 1
+    }
+  },
+  "persistentDirectories": [
+    {
+      "mountPath": "/home",
+      "gcePd": {
+        "sizeGb": 200,
+        "fsType": "ext4"
+      }
+    }
+  ]
 }
-},
-"persistentDirectories": [
-{
-"mountPath": "/home",
-"gcePd": {
-"sizeGb": 200,
-"fsType": "ext4"
-}
-}
-]
-}
-
 ```
 
 Create the config
-```
+```bash
 curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
  -H "Content-Type: application/json" \
  -d @config.json \
@@ -95,7 +91,7 @@ curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
 ```
 
 Check its running -> `reconciling: true` is a good sign
-```
+```bash
 curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
  -H "Content-Type: application/json" \
 "https://workstations.googleapis.com/v1beta/projects/${PROJECT}/locations/us-central1/workstationClusters/my-cluster/workstationConfigs/my-config"
@@ -116,7 +112,7 @@ test image
 #### SSH Access
 
 Create a tunnel 
-```
+```bash
 gcloud alpha workstations start-tcp-tunnel --project=${PROJECT} --region=us-central1 --cluster=my-cluster --config=my-config my-workstation 22 --local-host-port=:2222
 
 ```
@@ -137,6 +133,16 @@ If you would like to contribute to the CloudWorkstations repository, you can:
 
 
 
+# Notes
+Customise the workstation
+Machine Settings: Settings that apply globally when you connect to a Cloud Workstations virtual instance and that appear on your workstation in the $HOME/.codeoss-cloudworkstations/settings.json file.
+
+User Settings: Settings that apply globally when you connect to a Cloud Workstations virtual instance and that persist in browser storage for each workstation instance.
+
+Workspace Settings: Settings stored inside a workspace that only apply when opening that workspace. These settings appear with your workspace files in the $WORKSPACE_ROOT/.vscode/settings.json file.
+
+"User" level settings which are written to browser indexed db storage per origin, "Host" level settings are stored on the VM under $HOME/.codeoss-workstations/data/Machine/settings.json, and "Workspace" settings are stored under $WORKSPACE_ROOT/.vscode/settings.json. Overridden settings are resolved in the aforementioned order (User, Machine, Workspace), so If users wish to configure settings at image startup time they should be able to just write them to $HOME/.codeoss-workstations/data/Machine/settings.json.
+$HOME/.codeoss-cloudworkstations instead of /.codeoss-workstations
 
 
 

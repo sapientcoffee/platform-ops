@@ -48,7 +48,7 @@ variable "prefix" {
   default     = ""
 }
 
-variable "state_storage" {
-  description = "The location the TF state will be stored in Google Cloud"
-  type        = string
-}
+# variable "state_storage" {
+#   description = "The location the TF state will be stored in Google Cloud"
+#   type        = string
+# }

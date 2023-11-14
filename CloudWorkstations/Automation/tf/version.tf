@@ -19,15 +19,15 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 4.5"
+      version = "~> 4.84"
     }
     google-beta = {
       source  = "hashicorp/google-beta"
-      version = "~> 4.64"
+      version = "~> 4.84"
     }
     random = {
       source  = "hashicorp/random"
-      version = "~> 3.0"
+      version = "~> 3.5"
     }
   }
 }
