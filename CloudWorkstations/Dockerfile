@@ -1,6 +1,6 @@
 
 FROM us-central1-docker.pkg.dev/cloud-workstations-images/predefined/code-oss:latest
-ARG TERRAFORM_VERSION=1.6.2
+ARG TERRAFORM_VERSION=1.6.3
 
 # Install tooling
 ## terraform
