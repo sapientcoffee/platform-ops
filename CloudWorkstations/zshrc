@@ -89,6 +89,10 @@ source $ZSH/oh-my-zsh.sh
 export GOBIN=~/go/bin
 export PATH=$PATH:$GOBIN
 
+if [[ ! -a cobra-cli ]]; then
+    go install github.com/spf13/cobra-cli@latest
+fi
+
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
 
