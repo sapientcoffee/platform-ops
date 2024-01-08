@@ -79,13 +79,19 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git)
+plugins=(git terraform skaffold python kube-ps1 golang gcloud)
 
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
+export GOBIN=~/go/bin
+export PATH=$PATH:$GOBIN
+
+if [[ ! -a cobra-cli ]]; then
+    go install github.com/spf13/cobra-cli@latest
+fi
 
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
