@@ -98,6 +98,9 @@ curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
 
 ```
 
+### Customisation 
+To customise the workstation image and config follow [here](./custom.md).
+
 ### xyz Persona
 
 build container image
