@@ -50,7 +50,7 @@ COPY CloudWorkstations/200_custom.sh /sapientcoffee/scripts/200_custom.sh
 COPY CloudWorkstations/setup.sh /sapientcoffee/scripts/setup.sh
 
 ## Make executable and also do a time stamp to confirm the time it was created for rudimentary versioning 
-RUN chmod +x /etc/workstation-startup.d/200_custom.sh /sapientcoffee/scripts/setup.sh /sapientcoffee/scripts/nvm.sh && \
+RUN chmod +x /etc/workstation-startup.d/200_custom.sh /sapientcoffee/scripts/200_custom.sh /sapientcoffee/scripts/setup.sh && \
 	date >/sapientcoffee/scripts/version
 
 
