@@ -41,9 +41,9 @@ RUN mkdir -p /sapientcoffee/settings /sapientcoffee/scripts
 COPY CloudWorkstations/settings.json CloudWorkstations/p10k.zsh CloudWorkstations/zshrc /sapientcoffee/settings/
 COPY CloudWorkstations/custom.sh /etc/workstation-startup.d/200_custom.sh
 COPY CloudWorkstations/custom.sh /sapientcoffee/scripts/custom.sh
-COPY CloudWorkstations/nvm.sh /etc/workstation-startup.d/201_nvm.sh
+# COPY CloudWorkstations/nvm.sh /etc/workstation-startup.d/201_nvm.sh
 COPY CloudWorkstations/nvm.sh /sapientcoffee/scripts/nvm.sh
-RUN chmod +x /etc/workstation-startup.d/200_custom.sh /sapientcoffee/scripts/custom.sh /etc/workstation-startup.d/201_nvm.sh /sapientcoffee/scripts/nvm.sh && \
+RUN chmod +x /etc/workstation-startup.d/200_custom.sh /sapientcoffee/scripts/custom.sh /sapientcoffee/scripts/nvm.sh && \
 	date >/sapientcoffee/scripts/version
 
 

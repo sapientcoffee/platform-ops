@@ -93,6 +93,12 @@ if [[ ! -a cobra-cli ]]; then
     go install github.com/spf13/cobra-cli@latest
 fi
 
+if [ ! -f "/home/user/.sapientcoffee" ]; then
+  echo "The doesnt file exists."
+  /sapientcoffee/scripts/nvm.sh
+  touch /home/user/.sapientcoffee
+fi
+
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
 
