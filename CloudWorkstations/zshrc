@@ -95,7 +95,7 @@ fi
 
 if [ ! -f "/home/user/.sapientcoffee" ]; then
   echo "The doesnt file exists."
-  /sapientcoffee/scripts/nvm.sh
+  /sapientcoffee/scripts/setup.sh
   touch /home/user/.sapientcoffee
 fi
 

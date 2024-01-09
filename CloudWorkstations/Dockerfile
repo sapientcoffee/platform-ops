@@ -38,12 +38,19 @@ mv extension /opt/code-oss/extensions/terraform
 
 # Customisation of terminal (zsh, themes and layout)
 RUN mkdir -p /sapientcoffee/settings /sapientcoffee/scripts 
+
+## Copy profile (zsh) settings and also powerline config to the install script locations
 COPY CloudWorkstations/settings.json CloudWorkstations/p10k.zsh CloudWorkstations/zshrc /sapientcoffee/settings/
-COPY CloudWorkstations/custom.sh /etc/workstation-startup.d/200_custom.sh
-COPY CloudWorkstations/custom.sh /sapientcoffee/scripts/custom.sh
-# COPY CloudWorkstations/nvm.sh /etc/workstation-startup.d/201_nvm.sh
-COPY CloudWorkstations/nvm.sh /sapientcoffee/scripts/nvm.sh
-RUN chmod +x /etc/workstation-startup.d/200_custom.sh /sapientcoffee/scripts/custom.sh /sapientcoffee/scripts/nvm.sh && \
+
+## Copy Customisation Scripts
+COPY CloudWorkstations/200_custom.sh /etc/workstation-startup.d/200_custom.sh
+COPY CloudWorkstations/200_custom.sh /sapientcoffee/scripts/200_custom.sh
+
+## Copy profile setup script
+COPY CloudWorkstations/setup.sh /sapientcoffee/scripts/setup.sh
+
+## Make executable and also do a time stamp to confirm the time it was created for rudimentary versioning 
+RUN chmod +x /etc/workstation-startup.d/200_custom.sh /sapientcoffee/scripts/setup.sh /sapientcoffee/scripts/nvm.sh && \
 	date >/sapientcoffee/scripts/version
 
 
