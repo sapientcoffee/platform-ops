@@ -11,7 +11,7 @@
     "workbench.editor.sharedViewState": true,
     "terminal.integrated.fontFamily": "MesloLGS NF",
     "cloudcode.beta.enableSourceProtect": true,
-    "cloudcode.sourceprotect.policy_location": "sp.yaml"
+    "cloudcode.sourceprotect.policy_location": "sp.yaml",
     "cloudcode.yaml.format.enable": true
 
 }
