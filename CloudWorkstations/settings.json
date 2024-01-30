@@ -1,5 +1,6 @@
 {
     "editor.fontFamily": "'Droid Sans Mono', 'monospace', monospace",
+    "cloudcode.updateChannel": "Insiders",
     "editor.fontWeight": "normal",
     "workbench.colorTheme": "Monokai Dimmed",
     "files.autoSave": "onFocusChange",
@@ -8,5 +9,8 @@
     "cloudcode.duetAI.inlineSuggestions.enableAuto": true,
     "interactiveWindow.restore": true,
     "workbench.editor.sharedViewState": true,
-    "terminal.integrated.fontFamily": "MesloLGS NF"
+    "terminal.integrated.fontFamily": "MesloLGS NF",
+    "cloudcode.beta.enableSourceProtect": true,
+    "cloudcode.yaml.format.enable": true
+
 }
