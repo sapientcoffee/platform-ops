@@ -2,7 +2,7 @@ steps:
 - name: 'gcr.io/kaniko-project/executor:latest'
   args: [
     "--destination=europe-docker.pkg.dev/coffee-plantation/workstation/codeoss",
-    "--dockerfile=CloudWorkstations/Dockerfile",
+    "--dockerfile=./CloudWorkstations/Dockerfile",
     "--cache=true",
     "--cache-ttl=24h"]
   id: "Creating a Google Cloud Workstations Image"
