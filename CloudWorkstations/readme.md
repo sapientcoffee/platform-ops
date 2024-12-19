@@ -101,13 +101,23 @@ curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
 ### Customisation 
 To customise the workstation image and config follow [here](./custom.md).
 
-### xyz Persona
+### Platfrom Engineer Persona
+Maintaining an organisation base workstation image.
 
-build container image
+```
+gcloud config set project <project>
+gcloud login auth
+```
 
-test image
+```bash
+gcloud builds submit --region=us-central1 --tag us-west2-docker.pkg.dev/PROJECT_ID/quickstart-docker-repo/quickstart-image:tag1
+#gcloud builds submit --region=us-central1 --tag europe-docker.pkg.dev/coffee-plantation/workstation/codeoss
+```
+To test the image locally
 
-`docker run -p 8080:80 gcr.io/cloud-workstations-external/mycustomimage:latest`
+```bash
+docker run -p 8080:80 gcr.io/cloud-workstations-external/mycustomimage:latest
+```
 
 
 ### Developer Persona

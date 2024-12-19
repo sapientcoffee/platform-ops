@@ -1,6 +1,6 @@
 
 FROM us-central1-docker.pkg.dev/cloud-workstations-images/predefined/code-oss:latest
-ARG TERRAFORM_VERSION=1.6.3
+ARG TERRAFORM_VERSION=1.10.3
 
 # Install tooling
 ## terraform
@@ -20,14 +20,13 @@ RUN \
 ## Kustomize
 RUN curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash && echo "installed kustomize"
 
+RUN apt-get -y install nodejs
 
 ## Firebase CLI
 RUN curl -sL https://firebase.tools | bash && echo "installed firebase CLI"
+# RUN npm install -D genkit-cli
 
-## gcloud addons
-RUN sudo apt-get install google-cloud-sdk-terraform-tools && echo "installed gcloud terrafrom tools" 
-RUN sudo apt-get install google-cloud-sdk-config-connector && echo "installed gcloud config-connector"
-
+RUN apt update
 ## zsh
 RUN apt install -y zsh && echo "installed zsh"
 
@@ -40,14 +39,14 @@ mv extension /opt/code-oss/extensions/terraform
 RUN mkdir -p /sapientcoffee/settings /sapientcoffee/scripts 
 
 ## Copy profile (zsh) settings and also powerline config to the install script locations
-COPY CloudWorkstations/settings.json CloudWorkstations/p10k.zsh CloudWorkstations/zshrc /sapientcoffee/settings/
+COPY settings.json p10k.zsh zshrc /sapientcoffee/settings/
 
 ## Copy Customisation Scripts
-COPY CloudWorkstations/200_custom.sh /etc/workstation-startup.d/200_custom.sh
-COPY CloudWorkstations/200_custom.sh /sapientcoffee/scripts/200_custom.sh
+COPY 200_custom.sh /etc/workstation-startup.d/200_custom.sh
+COPY 200_custom.sh /sapientcoffee/scripts/200_custom.sh
 
 ## Copy profile setup script
-COPY CloudWorkstations/setup.sh /sapientcoffee/scripts/setup.sh
+COPY setup.sh /sapientcoffee/scripts/setup.sh
 
 ## Make executable and also do a time stamp to confirm the time it was created for rudimentary versioning 
 RUN chmod +x /etc/workstation-startup.d/200_custom.sh /sapientcoffee/scripts/200_custom.sh /sapientcoffee/scripts/setup.sh && \
