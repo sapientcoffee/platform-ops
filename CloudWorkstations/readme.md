@@ -167,7 +167,7 @@ The image is automatically built with Cloud Build to get the latest changes to t
 This project uses Google Cloud Build for continuous integration and delivery of the custom Workstation image.
 
 ### 🚀 Automation & Triggers
-The CI/CD pipeline is hosted in the GCP project `coffee-plantation`.
+The CI/CD pipeline is hosted in the GCP project `<YOUR_GCP_PROJECT_ID>`.
 
 | Event | Action | Outcome |
 | :--- | :--- | :--- |
