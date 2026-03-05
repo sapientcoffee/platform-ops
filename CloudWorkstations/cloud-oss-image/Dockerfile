@@ -10,15 +10,14 @@ USER root
 #     && apt-get install -y \
 #         apt-transport-https \
 
-RUN gcloud components update \
-     && gcloud components install alpha
-
-
-
-################################
-# Install Firebase
-################################
-RUN curl -sL -o firebase_install.sh https://firebase.tools && bash firebase_install.sh && rm firebase_install.sh
+RUN set -eux; \
+    gcloud components update; \
+    gcloud components install alpha; \
+    \
+    # Install Firebase
+    curl -sL -o firebase_install.sh https://firebase.tools; \
+    bash firebase_install.sh; \
+    rm firebase_install.sh
 
 # bashrc config
 RUN echo 'alias tf=terraform' >> ~/.bashrc
