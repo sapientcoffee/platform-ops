@@ -160,7 +160,30 @@ $HOME/.codeoss-cloudworkstations instead of /.codeoss-workstations
 
 
 
-The image is automatically built with Cloud Build every week to get the latest changes to the base Code OSS image, and the Cloud Workstations configuration is updated to use the latest tag. The processed is triggered by a Cloud Scheduler rule and images are stored in an Artifact Registry repository.
+The image is automatically built with Cloud Build to get the latest changes to the base Code OSS image, and the Cloud Workstations configuration is updated to use the latest tag. The processed is triggered by a repository push event and images are stored in an Artifact Registry repository.
+
+## CI/CD Workflow
+
+This project uses Google Cloud Build for continuous integration and delivery of the custom Workstation image.
+
+### 🚀 Automation & Triggers
+The CI/CD pipeline is hosted in the GCP project `coffee-plantation`.
+
+| Event | Action | Outcome |
+| :--- | :--- | :--- |
+| **Commit to Branch / Raise PR** | *No automatic action* | PRs currently do not have pre-merge validation. |
+| **Merge to `main` branch** | Triggers Cloud Build | Rebuilds the custom Code OSS image and pushes to Artifact Registry. |
+
+### 🛠️ Build Process (`cloudbuild-workstations.yaml`)
+The build uses **Kaniko** to create the container image without requiring a Docker daemon.
+
+1.  **Context Resolution:** The build context is set to the `CloudWorkstations/` directory so all `COPY` commands in the Dockerfile resolve correctly.
+2.  **Layer Caching:** Kaniko caches image layers for 24 hours to ensure fast subsequent builds.
+3.  **Artifact Storage:** The final image is pushed to:
+    `europe-docker.pkg.dev/coffee-plantation/workstation/codeoss:latest`
+
+### 💡 Post-Deployment
+Once the image is updated in the Artifact Registry, any Cloud Workstation configuration referencing the `:latest` tag will automatically provision new workstations using the updated image. Existing workstations will pick up the changes upon their next rebuild/restart depending on your workstation configuration settings.
 
 # Setup Cloud Workstations
 You will find the automation to stand up a new Google Cloud Workstation project in [./Automations](./Automation/tf/)
