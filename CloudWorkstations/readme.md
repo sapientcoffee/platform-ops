@@ -180,7 +180,9 @@ The build uses **Kaniko** to create the container image without requiring a Dock
 1.  **Context Resolution:** The build context is set to the `CloudWorkstations/` directory so all `COPY` commands in the Dockerfile resolve correctly.
 2.  **Layer Caching:** Kaniko caches image layers for 24 hours to ensure fast subsequent builds.
 3.  **Artifact Storage:** The final image is pushed to:
-    `europe-docker.pkg.dev/coffee-plantation/workstation/codeoss:latest`
+    ```
+    europe-docker.pkg.dev/<YOUR_GCP_PROJECT_ID>/workstation/codeoss:latest
+    ```
 
 ### 💡 Post-Deployment
 Once the image is updated in the Artifact Registry, any Cloud Workstation configuration referencing the `:latest` tag will automatically provision new workstations using the updated image. Existing workstations will pick up the changes upon their next rebuild/restart depending on your workstation configuration settings.
