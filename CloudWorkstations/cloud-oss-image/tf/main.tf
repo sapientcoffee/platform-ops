@@ -2,11 +2,11 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 4.44.0"
+      version = "~> 7.22.0"
     }
     google-beta = {
       source  = "hashicorp/google-beta"
-      version = "~> 4.44.0"
+      version = "~> 7.22.0"
     }
   }
 }
@@ -27,7 +27,7 @@ locals {
 
 module "project_services" {
   source  = "terraform-google-modules/project-factory/google//modules/project_services"
-  version = "~> 13.0"
+  version = "~> 18.0"
 
   project_id  = var.gcp_project_id
   enable_apis = var.enable_apis

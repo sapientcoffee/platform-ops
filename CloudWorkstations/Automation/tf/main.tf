@@ -28,7 +28,7 @@
 
 module "workstation_project" {
   source  = "terraform-google-modules/project-factory/google//examples/fabric_project"
-  version = "14.2.0"
+  version = "18.2.0"
   billing_account = var.billing_account
   parent          = var.parent
   name            = var.name
