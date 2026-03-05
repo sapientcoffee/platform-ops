@@ -160,7 +160,7 @@ $HOME/.codeoss-cloudworkstations instead of /.codeoss-workstations
 
 
 
-The image is automatically built with Cloud Build to get the latest changes to the base Code OSS image, and the Cloud Workstations configuration is updated to use the latest tag. The processed is triggered by a repository push event and images are stored in an Artifact Registry repository.
+The image is automatically built with Cloud Build to get the latest changes to the base Code OSS image, and the Cloud Workstations configuration is updated to use the latest tag. The process is triggered by a repository push event and images are stored in an Artifact Registry repository.
 
 ## CI/CD Workflow
 
