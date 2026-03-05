@@ -18,7 +18,7 @@ RUN gcloud components update \
 ################################
 # Install Firebase
 ################################
-RUN curl -sL https://firebase.tools | bash
+RUN curl -sL -o firebase_install.sh https://firebase.tools && bash firebase_install.sh && rm firebase_install.sh
 
 # bashrc config
 RUN echo 'alias tf=terraform' >> ~/.bashrc

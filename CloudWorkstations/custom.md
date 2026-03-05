@@ -42,10 +42,10 @@ RUN \
    echo "installed terraform"
 
 ## Kustomize
-RUN curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash && echo "installed kustomize"
+RUN curl -s -o install_kustomize.sh "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" && bash install_kustomize.sh && rm install_kustomize.sh && echo "installed kustomize"
 
 ## Firebase CLI
-RUN curl -sL https://firebase.tools | bash && echo "installed firebase CLI"
+RUN curl -sL -o firebase_install.sh https://firebase.tools && bash firebase_install.sh && rm firebase_install.sh && echo "installed firebase CLI"
 ```
 
 With the binaries in place, it was time to sprinkle some plugin magic into my IDE. I simply downloaded these plugins and placed then in the relevant directory via my Dockerfile, grabbing them from [open-vsx](https://open-vsx.org) (more examples exist in the [documentation](https://cloud.google.com/workstations/docs/extensions-marketplace)):
