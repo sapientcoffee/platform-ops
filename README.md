@@ -39,6 +39,3 @@ The following is a high-level overview of remote development in GCP using Cloud 
 ### Google Cloud Workstaions
 Configuration examples and demos are in the [CloudWorkstations](CloudWorkstations/) folder.
 
-### Cloud Shell
-Configuration examples and demos are in the [CloudShell](CloudShell/) folder.
-
