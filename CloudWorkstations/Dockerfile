@@ -1,6 +1,6 @@
 
 FROM us-central1-docker.pkg.dev/cloud-workstations-images/predefined/code-oss:latest
-ARG TERRAFORM_VERSION=1.10.3
+ARG TERRAFORM_VERSION=1.14.6
 
 # Install tooling
 ## terraform
@@ -31,8 +31,8 @@ RUN apt update
 RUN apt install -y zsh && echo "installed zsh"
 
 # Install Code OSS Plugins (from open-vsx.org)
-RUN wget https://open-vsx.org/api/hashicorp/terraform/linux-x64/2.28.2/file/hashicorp.terraform-2.28.2@linux-x64.vsix  && \
-unzip hashicorp.terraform-2.28.2@linux-x64.vsix "extension/*" &&\
+RUN wget https://open-vsx.org/api/hashicorp/terraform/linux-x64/2.39.0/file/hashicorp.terraform-2.39.0@linux-x64.vsix  && \
+unzip hashicorp.terraform-2.39.0@linux-x64.vsix "extension/*" &&\
 mv extension /opt/code-oss/extensions/terraform
 
 # Customisation of terminal (zsh, themes and layout)
