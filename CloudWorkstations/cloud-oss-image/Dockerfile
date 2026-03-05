@@ -30,53 +30,55 @@ USER root
 
 # VS Code Extensions from https://open-vsx.org/
 ARG JAVA_DEBUG_VER=0.58.5
-RUN VSIX_FILE="vscjava.vscode-java-debug-${JAVA_DEBUG_VER}.vsix" && \
-    wget "https://open-vsx.org/api/vscjava/vscode-java-debug/${JAVA_DEBUG_VER}/file/${VSIX_FILE}" && \
-    unzip "${VSIX_FILE}" "extension/*" && \
-    mv extension /opt/code-oss/extensions/java-debug && \
-    rm "${VSIX_FILE}"
- 
 ARG JAVA_DEP_VER=0.27.0
-RUN VSIX_FILE="vscjava.vscode-java-dependency-${JAVA_DEP_VER}.vsix" && \
-    wget "https://open-vsx.org/api/vscjava/vscode-java-dependency/${JAVA_DEP_VER}/file/${VSIX_FILE}" && \
-    unzip "${VSIX_FILE}" "extension/*" && \
-    mv extension /opt/code-oss/extensions/java-dependency && \
-    rm "${VSIX_FILE}"
- 
 ARG REDHAT_JAVA_VER=1.54.2026030508
-RUN VSIX_FILE="redhat.java-${REDHAT_JAVA_VER}.vsix" && \
-    wget "https://open-vsx.org/api/redhat/java/${REDHAT_JAVA_VER}/file/${VSIX_FILE}" && \
-    unzip "${VSIX_FILE}" "extension/*" && \
-    mv extension /opt/code-oss/extensions/redhat-java && \
-    rm "${VSIX_FILE}"
- 
 ARG MAVEN_VER=0.45.1
-RUN VSIX_FILE="vscjava.vscode-maven-${MAVEN_VER}.vsix" && \
-    wget "https://open-vsx.org/api/vscjava/vscode-maven/${MAVEN_VER}/file/${VSIX_FILE}" && \
-    unzip "${VSIX_FILE}" "extension/*" && \
-    mv extension /opt/code-oss/extensions/java-maven && \
-    rm "${VSIX_FILE}"
- 
 ARG JAVA_TEST_VER=0.44.0
-RUN VSIX_FILE="vscjava.vscode-java-test-${JAVA_TEST_VER}.vsix" && \
-    wget "https://open-vsx.org/api/vscjava/vscode-java-test/${JAVA_TEST_VER}/file/${VSIX_FILE}" && \
-    unzip "${VSIX_FILE}" "extension/*" && \
-    mv extension /opt/code-oss/extensions/java-test && \
-    rm "${VSIX_FILE}"
-
 ARG DART_VER=3.131.20260304
-RUN VSIX_FILE="Dart-Code.dart-code-${DART_VER}.vsix" && \
-    wget "https://open-vsx.org/api/Dart-Code/dart-code/${DART_VER}/file/${VSIX_FILE}" && \
-    unzip "${VSIX_FILE}" "extension/*" && \
-    mv extension /opt/code-oss/extensions/dart && \
-    rm "${VSIX_FILE}"
-
 ARG FLUTTER_VER=3.131.20260303
-RUN VSIX_FILE="Dart-Code.flutter-${FLUTTER_VER}.vsix" && \
-    wget "https://open-vsx.org/api/Dart-Code/flutter/${FLUTTER_VER}/file/${VSIX_FILE}" && \
-    unzip "${VSIX_FILE}" "extension/*" && \
+
+RUN set -eux; \
+    VSIX_FILE1="vscjava.vscode-java-debug-${JAVA_DEBUG_VER}.vsix"; \
+    wget "https://open-vsx.org/api/vscjava/vscode-java-debug/${JAVA_DEBUG_VER}/file/${VSIX_FILE1}" && \
+    unzip "${VSIX_FILE1}" "extension/*" && \
+    mv extension /opt/code-oss/extensions/java-debug && \
+    rm "${VSIX_FILE1}"; \
+    \
+    VSIX_FILE2="vscjava.vscode-java-dependency-${JAVA_DEP_VER}.vsix"; \
+    wget "https://open-vsx.org/api/vscjava/vscode-java-dependency/${JAVA_DEP_VER}/file/${VSIX_FILE2}" && \
+    unzip "${VSIX_FILE2}" "extension/*" && \
+    mv extension /opt/code-oss/extensions/java-dependency && \
+    rm "${VSIX_FILE2}"; \
+    \
+    VSIX_FILE3="redhat.java-${REDHAT_JAVA_VER}.vsix"; \
+    wget "https://open-vsx.org/api/redhat/java/${REDHAT_JAVA_VER}/file/${VSIX_FILE3}" && \
+    unzip "${VSIX_FILE3}" "extension/*" && \
+    mv extension /opt/code-oss/extensions/redhat-java && \
+    rm "${VSIX_FILE3}"; \
+    \
+    VSIX_FILE4="vscjava.vscode-maven-${MAVEN_VER}.vsix"; \
+    wget "https://open-vsx.org/api/vscjava/vscode-maven/${MAVEN_VER}/file/${VSIX_FILE4}" && \
+    unzip "${VSIX_FILE4}" "extension/*" && \
+    mv extension /opt/code-oss/extensions/java-maven && \
+    rm "${VSIX_FILE4}"; \
+    \
+    VSIX_FILE5="vscjava.vscode-java-test-${JAVA_TEST_VER}.vsix"; \
+    wget "https://open-vsx.org/api/vscjava/vscode-java-test/${JAVA_TEST_VER}/file/${VSIX_FILE5}" && \
+    unzip "${VSIX_FILE5}" "extension/*" && \
+    mv extension /opt/code-oss/extensions/java-test && \
+    rm "${VSIX_FILE5}"; \
+    \
+    VSIX_FILE6="Dart-Code.dart-code-${DART_VER}.vsix"; \
+    wget "https://open-vsx.org/api/Dart-Code/dart-code/${DART_VER}/file/${VSIX_FILE6}" && \
+    unzip "${VSIX_FILE6}" "extension/*" && \
+    mv extension /opt/code-oss/extensions/dart && \
+    rm "${VSIX_FILE6}"; \
+    \
+    VSIX_FILE7="Dart-Code.flutter-${FLUTTER_VER}.vsix"; \
+    wget "https://open-vsx.org/api/Dart-Code/flutter/${FLUTTER_VER}/file/${VSIX_FILE7}" && \
+    unzip "${VSIX_FILE7}" "extension/*" && \
     mv extension /opt/code-oss/extensions/flutter && \
-    rm "${VSIX_FILE}"
+    rm "${VSIX_FILE7}"
 
 # User scripts
 # COPY settings.json /home/user/.config/Code/User/settings.json
