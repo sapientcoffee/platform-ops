@@ -14,6 +14,9 @@ Over the years the capabilities and offerings have grown on Google Cloud
 * 2020 -> [Cloud Shell Editor](https://cloud.google.com/shell) (Updated IDE with source control, debugger and emulators including enabling quick exploration of cloud services)
 * 2023 -> [Cloud Workstations](https://cloud.google.com/workstations)
 * 2023 -> [Project IDX](https://developers.google.com/idx) (part of a wider Google experimental new initiative aimed at bringing your entire full-stack, multiplatform app development workflow to the cloud)
+* 2024 -> AI Assisted Dev 🚀 (GenAI integration into core development workflows)
+* 2025 -> AI Assisted Dev 🤖 (AI agents like Jules alter the paradigm; `Gemini CLI` emerges as a key addition)
+* 2026 -> AI Assisted Dev ✨ (Release of "Enterprise" version of Antigravity)
 
 So what is the differece between Cloud Shell and Cloud Workstations?
 * Cloud Shell (onboarding/learning focused)
