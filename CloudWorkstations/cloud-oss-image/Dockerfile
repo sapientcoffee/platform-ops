@@ -29,33 +29,54 @@ USER root
 
 
 # VS Code Extensions from https://open-vsx.org/
-RUN wget https://open-vsx.org/api/vscjava/vscode-java-debug/0.58.5/file/vscjava.vscode-java-debug-0.58.5.vsix && \
-unzip vscjava.vscode-java-debug-0.58.5.vsix "extension/*" &&\
-mv extension /opt/code-oss/extensions/java-debug
+ARG JAVA_DEBUG_VER=0.58.5
+RUN VSIX_FILE="vscjava.vscode-java-debug-${JAVA_DEBUG_VER}.vsix" && \
+    wget "https://open-vsx.org/api/vscjava/vscode-java-debug/${JAVA_DEBUG_VER}/file/${VSIX_FILE}" && \
+    unzip "${VSIX_FILE}" "extension/*" && \
+    mv extension /opt/code-oss/extensions/java-debug && \
+    rm "${VSIX_FILE}"
  
-RUN wget https://open-vsx.org/api/vscjava/vscode-java-dependency/0.27.0/file/vscjava.vscode-java-dependency-0.27.0.vsix && \
-unzip vscjava.vscode-java-dependency-0.27.0.vsix "extension/*" &&\
-mv extension /opt/code-oss/extensions/java-dependency
+ARG JAVA_DEP_VER=0.27.0
+RUN VSIX_FILE="vscjava.vscode-java-dependency-${JAVA_DEP_VER}.vsix" && \
+    wget "https://open-vsx.org/api/vscjava/vscode-java-dependency/${JAVA_DEP_VER}/file/${VSIX_FILE}" && \
+    unzip "${VSIX_FILE}" "extension/*" && \
+    mv extension /opt/code-oss/extensions/java-dependency && \
+    rm "${VSIX_FILE}"
  
-RUN wget https://open-vsx.org/api/redhat/java/1.54.2026030508/file/redhat.java-1.54.2026030508.vsix && \
-unzip redhat.java-1.54.2026030508.vsix "extension/*" &&\
-mv extension /opt/code-oss/extensions/redhat-java
+ARG REDHAT_JAVA_VER=1.54.2026030508
+RUN VSIX_FILE="redhat.java-${REDHAT_JAVA_VER}.vsix" && \
+    wget "https://open-vsx.org/api/redhat/java/${REDHAT_JAVA_VER}/file/${VSIX_FILE}" && \
+    unzip "${VSIX_FILE}" "extension/*" && \
+    mv extension /opt/code-oss/extensions/redhat-java && \
+    rm "${VSIX_FILE}"
  
-RUN wget https://open-vsx.org/api/vscjava/vscode-maven/0.45.1/file/vscjava.vscode-maven-0.45.1.vsix && \
-unzip vscjava.vscode-maven-0.45.1.vsix "extension/*" &&\
-mv extension /opt/code-oss/extensions/java-maven
+ARG MAVEN_VER=0.45.1
+RUN VSIX_FILE="vscjava.vscode-maven-${MAVEN_VER}.vsix" && \
+    wget "https://open-vsx.org/api/vscjava/vscode-maven/${MAVEN_VER}/file/${VSIX_FILE}" && \
+    unzip "${VSIX_FILE}" "extension/*" && \
+    mv extension /opt/code-oss/extensions/java-maven && \
+    rm "${VSIX_FILE}"
  
-RUN wget https://open-vsx.org/api/vscjava/vscode-java-test/0.44.0/file/vscjava.vscode-java-test-0.44.0.vsix && \
-unzip vscjava.vscode-java-test-0.44.0.vsix "extension/*" &&\
-mv extension /opt/code-oss/extensions/java-test
+ARG JAVA_TEST_VER=0.44.0
+RUN VSIX_FILE="vscjava.vscode-java-test-${JAVA_TEST_VER}.vsix" && \
+    wget "https://open-vsx.org/api/vscjava/vscode-java-test/${JAVA_TEST_VER}/file/${VSIX_FILE}" && \
+    unzip "${VSIX_FILE}" "extension/*" && \
+    mv extension /opt/code-oss/extensions/java-test && \
+    rm "${VSIX_FILE}"
 
-RUN wget https://open-vsx.org/api/Dart-Code/dart-code/3.131.20260304/file/Dart-Code.dart-code-3.131.20260304.vsix && \
-unzip Dart-Code.dart-code-3.131.20260304.vsix "extension/*" &&\
-mv extension /opt/code-oss/extensions/dart
+ARG DART_VER=3.131.20260304
+RUN VSIX_FILE="Dart-Code.dart-code-${DART_VER}.vsix" && \
+    wget "https://open-vsx.org/api/Dart-Code/dart-code/${DART_VER}/file/${VSIX_FILE}" && \
+    unzip "${VSIX_FILE}" "extension/*" && \
+    mv extension /opt/code-oss/extensions/dart && \
+    rm "${VSIX_FILE}"
 
-RUN wget https://open-vsx.org/api/Dart-Code/flutter/3.131.20260303/file/Dart-Code.flutter-3.131.20260303.vsix && \
-unzip Dart-Code.flutter-3.131.20260303.vsix "extension/*" &&\
-mv extension /opt/code-oss/extensions/flutter
+ARG FLUTTER_VER=3.131.20260303
+RUN VSIX_FILE="Dart-Code.flutter-${FLUTTER_VER}.vsix" && \
+    wget "https://open-vsx.org/api/Dart-Code/flutter/${FLUTTER_VER}/file/${VSIX_FILE}" && \
+    unzip "${VSIX_FILE}" "extension/*" && \
+    mv extension /opt/code-oss/extensions/flutter && \
+    rm "${VSIX_FILE}"
 
 # User scripts
 # COPY settings.json /home/user/.config/Code/User/settings.json

@@ -31,9 +31,12 @@ RUN apt update
 RUN apt install -y zsh && echo "installed zsh"
 
 # Install Code OSS Plugins (from open-vsx.org)
-RUN wget https://open-vsx.org/api/hashicorp/terraform/linux-x64/2.39.0/file/hashicorp.terraform-2.39.0@linux-x64.vsix  && \
-unzip hashicorp.terraform-2.39.0@linux-x64.vsix "extension/*" &&\
-mv extension /opt/code-oss/extensions/terraform
+ARG TF_EXT_VERSION=2.39.0
+RUN VSIX_FILE="hashicorp.terraform-${TF_EXT_VERSION}@linux-x64.vsix" && \
+    wget "https://open-vsx.org/api/hashicorp/terraform/linux-x64/${TF_EXT_VERSION}/file/${VSIX_FILE}" && \
+    unzip "${VSIX_FILE}" "extension/*" && \
+    mv extension /opt/code-oss/extensions/terraform && \
+    rm "${VSIX_FILE}"
 
 # Customisation of terminal (zsh, themes and layout)
 RUN mkdir -p /sapientcoffee/settings /sapientcoffee/scripts 
