@@ -12,9 +12,13 @@ RUN apt-get update && \
 # Install @google/gemini-cli globally
 RUN npm install -g @google/gemini-cli@preview
 
-# Use a custom home directory and pre-create the .gemini config folder to avoid ENOENT rename errors
-RUN mkdir -p /gemini-home/.gemini && chmod -R 777 /gemini-home
-ENV HOME=/gemini-home
+# Create a truly world-writable config directory outside of standard paths
+RUN mkdir -p /gemini-config/.gemini && \
+    touch /gemini-config/.gemini/projects.json && \
+    chmod -R 777 /gemini-config
+
+# Force gemini-cli to use this directory by setting HOME
+ENV HOME=/gemini-config
 
 # Default entrypoint is gemini
 ENTRYPOINT ["gemini"]
