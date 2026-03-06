@@ -21,7 +21,7 @@ gcloud builds submit --config cloudbuild.yaml .
 ```
 
 The image will be tagged as:
-`us-docker.pkg.dev/$PROJECT_ID/gcr.io/geminicli-builder:latest`
+`europe-docker.pkg.dev/coffee-plantation/workstation/geminicli-builder:latest`
 
 ## Using it in Cloud Build
 
@@ -31,7 +31,7 @@ You can use this builder in your other Cloud Build jobs by referencing its image
 
 ```yaml
 steps:
-- name: 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/geminicli-builder'
+- name: 'europe-docker.pkg.dev/coffee-plantation/workstation/geminicli-builder'
   args: ['Explain why I should use Gemini CLI for platform operations.']
 ```
 
@@ -39,7 +39,7 @@ steps:
 
 ```yaml
 steps:
-- name: 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/geminicli-builder'
+- name: 'europe-docker.pkg.dev/coffee-plantation/workstation/geminicli-builder'
   args: ['-y', 'Update the license header in all src/*.py files to Apache 2.0.']
 ```
 
