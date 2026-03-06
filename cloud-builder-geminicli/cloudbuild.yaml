@@ -6,8 +6,8 @@ steps:
       - 'build'
       - '--tag=europe-docker.pkg.dev/coffee-plantation/workstation/geminicli-builder:latest'
       - '-f'
-      - 'cloud-builder-geminicli/Dockerfile'
-      - 'cloud-builder-geminicli/.'
+      - 'Dockerfile'
+      - '.'
 
   # Smoke test: check version
   - name: 'europe-docker.pkg.dev/coffee-plantation/workstation/geminicli-builder:latest'

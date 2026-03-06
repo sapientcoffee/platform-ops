@@ -6,8 +6,8 @@ steps:
       - 'build'
       - '--tag=europe-docker.pkg.dev/coffee-plantation/workstation/geminicli-builder:$SHORT_SHA'
       - '-f'
-      - 'cloud-builder-geminicli/Dockerfile'
-      - 'cloud-builder-geminicli/.'
+      - 'Dockerfile'
+      - '.'
 
   # Smoke test: check version using the SHA-tagged image
   - name: 'europe-docker.pkg.dev/coffee-plantation/workstation/geminicli-builder:$SHORT_SHA'
