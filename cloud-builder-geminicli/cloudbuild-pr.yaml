@@ -2,6 +2,7 @@ steps:
   # Build the image (without pushing it as 'latest')
   - name: 'gcr.io/cloud-builders/docker'
     id: 'build'
+    dir: 'cloud-builder-geminicli'
     args:
       - 'build'
       - '--tag=us-docker.pkg.dev/coffee-plantation/cloud-build-builder/gemini-builder:$SHORT_SHA'
@@ -12,6 +13,7 @@ steps:
   # Smoke test: check version using the SHA-tagged image
   - name: 'us-docker.pkg.dev/coffee-plantation/cloud-build-builder/gemini-builder:$SHORT_SHA'
     id: 'smoke-test-gemini'
+    dir: 'cloud-builder-geminicli'
     args: ['--version']
 
 # Note: We do NOT include the 'images' section here to avoid pushing to the registry 
