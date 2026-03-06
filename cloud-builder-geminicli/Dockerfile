@@ -12,5 +12,11 @@ RUN apt-get update && \
 # Install @google/gemini-cli globally
 RUN npm install -g @google/gemini-cli@preview
 
+# Pre-create the .gemini directory with open permissions to avoid ENOENT errors in non-root environments
+RUN mkdir -p /builder/home/.gemini && chmod -R 777 /builder/home
+
+# Set HOME to /builder/home so gemini-cli uses it for configuration
+ENV HOME=/builder/home
+
 # Default entrypoint is gemini
 ENTRYPOINT ["gemini"]
