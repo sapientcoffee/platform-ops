@@ -25,7 +25,7 @@ steps:
   id: "Sanity Check - Tooling"
 
 timeout: '3600s'
+logsBucket: 'gs://coffee-plantation_cloudbuild/logs'
 options:
-  logging: CLOUD_LOGGING_ONLY
-  logsBucket: 'gs://coffee-plantation_cloudbuild/logs'
+  logging: GCS_ONLY
   logStreamingOption: STREAM_ON
