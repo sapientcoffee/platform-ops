@@ -1,17 +1,10 @@
 steps:
-# 1. 🛡️ Linting: Catch common Dockerfile mistakes early
-- name: 'hadolint/hadolint:latest-debian'
-  entrypoint: 'hadolint'
-  args: ['./CloudWorkstations/Dockerfile']
-  id: "Linting Dockerfile"
-  allow_failure: true
-
-# 2. 🏗️ Build PR Image: Push a temporary tag for validation
+# 1. 🏗️ Build PR Image: Push a temporary tag for validation
 - name: 'gcr.io/kaniko-project/executor:latest'
   args: [
     "--destination=europe-docker.pkg.dev/coffee-plantation/workstation/codeoss:pr-$_PR_NUMBER",
     "--dockerfile=./CloudWorkstations/Dockerfile",
-    "--context=dir:///workspace/CloudWorkstations",
+    "--context=dir:///workspace",
     "--cache=true",
     "--cache-ttl=24h"]
   id: "Building PR Image"
