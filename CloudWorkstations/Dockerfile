@@ -5,7 +5,11 @@ ARG TERRAFORM_VERSION=1.14.6
 # Install tooling
 RUN set -eux; \
     apt-get update; \
-    apt-get install -y nodejs zsh; \
+    apt-get install -y nodejs zsh tmux neovim ripgrep fd-find git; \
+    \
+    # yadm
+    curl -fLo /usr/local/bin/yadm https://github.com/TheLocehiliosan/yadm/raw/master/yadm; \
+    chmod a+x /usr/local/bin/yadm; \
     \
     # terraform
     wget --progress=dot:mega https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip; \
@@ -39,8 +43,8 @@ RUN set -eux; \
 # Customisation of terminal (zsh, themes and layout)
 RUN mkdir -p /sapientcoffee/settings /sapientcoffee/scripts 
 
-## Copy profile (zsh) settings and also powerline config to the install script locations
-COPY settings.json p10k.zsh zshrc /sapientcoffee/settings/
+## Copy profile settings to the install script locations
+COPY settings.json /sapientcoffee/settings/
 
 ## Copy Customisation Scripts
 COPY 200_custom.sh /etc/workstation-startup.d/200_custom.sh
