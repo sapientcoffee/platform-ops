@@ -1,10 +1,10 @@
 
-FROM us-central1-docker.pkg.dev/cloud-workstations-images/predefined/code-oss:latest
+FROM us-central1-docker.pkg.dev/cloud-workstations-images/predefined/code-oss:code-oss-1.89.1
 ARG TERRAFORM_VERSION=1.14.6
 
 # Install tooling
 RUN set -eux; \
-    apt-get update; \
+    apt-get update || true; \
     apt-get install -y nodejs zsh tmux neovim ripgrep fd-find git; \
     \
     # yadm
@@ -20,7 +20,7 @@ RUN set -eux; \
     \
     # Kustomize
     curl -s -o install_kustomize.sh "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"; \
-    bash install_kustomize.sh; \
+    bash install_kustomize.sh /usr/local/bin; \
     rm install_kustomize.sh; \
     \
     # Firebase CLI
@@ -44,14 +44,14 @@ RUN set -eux; \
 RUN mkdir -p /sapientcoffee/settings /sapientcoffee/scripts 
 
 ## Copy profile settings to the install script locations
-COPY settings.json /sapientcoffee/settings/
+COPY CloudWorkstations/settings.json /sapientcoffee/settings/
 
 ## Copy Customisation Scripts
-COPY 200_custom.sh /etc/workstation-startup.d/200_custom.sh
-COPY 200_custom.sh /sapientcoffee/scripts/200_custom.sh
+COPY CloudWorkstations/200_custom.sh /etc/workstation-startup.d/200_custom.sh
+COPY CloudWorkstations/200_custom.sh /sapientcoffee/scripts/200_custom.sh
 
 ## Copy profile setup script
-COPY setup.sh /sapientcoffee/scripts/setup.sh
+COPY CloudWorkstations/setup.sh /sapientcoffee/scripts/setup.sh
 
 ## Make executable and also do a time stamp to confirm the time it was created for rudimentary versioning 
 RUN chmod +x /etc/workstation-startup.d/200_custom.sh /sapientcoffee/scripts/200_custom.sh /sapientcoffee/scripts/setup.sh && \

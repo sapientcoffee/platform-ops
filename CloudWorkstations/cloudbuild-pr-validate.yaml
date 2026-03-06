@@ -1,0 +1,31 @@
+steps:
+# 1. 🏗️ Build PR Image: Push a temporary tag for validation
+- name: 'gcr.io/kaniko-project/executor:latest'
+  args: [
+    "--destination=europe-docker.pkg.dev/coffee-plantation/workstation/codeoss:pr-$_PR_NUMBER",
+    "--dockerfile=./CloudWorkstations/Dockerfile",
+    "--context=dir:///workspace",
+    "--cache=true",
+    "--cache-ttl=24h"]
+  id: "Building PR Image"
+
+# 3. 🧪 Smoke Tests: Validate the PR build before merging
+- name: 'europe-docker.pkg.dev/coffee-plantation/workstation/codeoss:pr-$_PR_NUMBER'
+  entrypoint: 'zsh'
+  args: 
+    - '-c'
+    - |
+      set -e
+      echo "Running PR Smoke Tests..."
+      terraform --version
+      yadm --version
+      kustomize version
+      firebase --version
+      echo "✅ PR validation successful!"
+  id: "Sanity Check - Tooling"
+
+timeout: '3600s'
+logsBucket: 'gs://coffee-plantation_cloudbuild/logs'
+options:
+  logging: GCS_ONLY
+  logStreamingOption: STREAM_ON

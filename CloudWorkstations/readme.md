@@ -1,34 +1,30 @@
-# Cloud Workstations
+# 🏗️ Google Cloud Workstations: The Roastery
 
-The home for Cloud Workstation templates and automation examples. 
+Welcome to the heart of the operation! 🏗️ This directory contains everything you need to brew, automate, and customize your premium **Google Cloud Workstations**. Whether you're a Master Roaster (Admin) or a Barista (Developer), you'll find the right tools here to serve up a world-class coding experience.
 
+---
 
-## Directory Structure
-The CloudWorkstations directory contains the following files and directories:
+## 📋 The Menu (Directory Structure)
 
-* README.md: This file provides some level of documentaion (you are reading it now)
-* [DEPRECATED/](./DEPRECATED/): This directory contains legacy examples, mainly from pre-GA and early access to the product.
-* [Automations/](./Automation/): This directory contains the automation to stand up a new Google Cloud Workstation project (still WIP and not been looked at for a while).
-* [cloud-oss-image/](./cloud-oss-image/): This director contains some early experimentation for creating a custom image and also customisating the IDE.
-* [cloudbuild-worksations-cluster.yaml](./cloudbuild-workstation-cluster.yaml): An experimental Cloud Build manifest for updating cluster config based on a trigger watching repo changes.
-* [cloudbuild-worksations.yaml](./cloudbuild-workstations.yaml): Cloud Build Manifest to build the Workstation image and store in Artifact Registry (things are hardcoded at the moment). Can be used in conjunction with a trigger that will automatically update the Workstation container image upon changes to the repo.
-* [custom.sh](./custom.sh): Script that is loaded into the Workstation image that is run at creation time to customise the configuration.
-* [Dockerfile](./Dockerfile): Defintion to create the workstation container image.
-* [settings.json](./settings.json): The Code OSS settings to customise the look at feel of the IDE interface (e.g. dark theme, enable DuetAI etc.). Transfered to the workstation container imange and the copied to the correct location by custom.sh at deplyment time.
+Explore our specialized blends:
 
+*   **[Automation/](./Automation/)**: The high-capacity roasting machine. Terraform configurations to stand up entire workstation clusters and projects from scratch.
+*   **[cloud-oss-image/](./cloud-oss-image/)**: Experimental micro-roasts. Early tests for creating and customizing the IDE environment.
+*   **[DEPRECATED/](./DEPRECATED/)**: Legacy beans. Historical examples from the pre-GA days.
+*   **[Dockerfile](./Dockerfile)**: The secret recipe. Defines the custom container image with all your essential tools and plugins.
+*   **[200_custom.sh](./200_custom.sh)**: The morning ritual. A startup script that configures your environment (now with **YADM** dotfile support!).
+*   **[settings.json](./settings.json)**: The perfect grind. Custom Code OSS settings for a consistent IDE look and feel.
 
-## Getting Started
-To get started with Cloud Workstations, you can:
-* Visit the [Cloud Workstations documentation](https://cloud.google.com/workstations/docs/).
-* Clone the CloudWorkstations repository to your local machine.
-* <insert instructions here>
+---
 
-### Admin Persona
+## ☕ Brewing Guide (Getting Started)
 
-#### Create a cluster
-A workstation cluster holds all the workstations and workstation configs, it also defines which VPC your workstations will be created in. 
-* create a file called cluster.json* describing the cluster you want to create 
+### 👑 The Master Roaster (Admin Persona)
 
+#### 1. Create a Cluster
+A workstation cluster is your "espresso machine"—it holds all your configurations and defines the VPC where the magic happens.
+
+Define your `cluster.json`:
 ```json
 {
   "network": "projects/your-project/global/networks/default",
@@ -36,154 +32,81 @@ A workstation cluster holds all the workstations and workstation configs, it als
 }
 ```
 
+Fire up the machine:
 ```bash
-export PROJECT=your-project #This is the project id
+export PROJECT=your-project
+curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+     -H "Content-Type: application/json" \
+     -d @cluster.json \
+     "https://workstations.googleapis.com/v1beta/projects/${PROJECT}/locations/us-central1/workstationClusters?workstation_cluster_id=my-cluster"
 ```
+
+#### 2. Create a Workstation Configuration
+This is your "recipe" for the individual workstations.
 
 ```bash
 curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
- -H "Content-Type: application/json" \
- -d @cluster.json \
-"https://workstations.googleapis.com/v1beta/projects/${PROJECT}/locations/us-central1/workstationClusters?workstation_cluster_id=my-cluster"
+     -H "Content-Type: application/json" \
+     -d @config.json \
+     "https://workstations.googleapis.com/v1beta/projects/${PROJECT}/locations/us-central1/workstationClusters/my-cluster/workstationConfigs?workstation_config_id=my-config"
 ```
 
-Check its running
+---
+
+### 🛠️ The Platform Engineer (Maintainer Persona)
+
+Maintaining the organization's base image is key to a consistent flavor.
 
 ```bash
-curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
- -H "Content-Type: application/json" \
-"https://workstations.googleapis.com/v1beta/projects/${PROJECT}/locations/us-central1/workstationClusters/my-cluster"
-
-```
-#### Create a workstation
-
-config.json
-```json
-{
-  "idleTimeout": "7200s",
-  "host": {
-    "gce_instance": {
-      "machine_type": "e2-standard-8",
-      "pool_size": 1
-    }
-  },
-  "persistentDirectories": [
-    {
-      "mountPath": "/home",
-      "gcePd": {
-        "sizeGb": 200,
-        "fsType": "ext4"
-      }
-    }
-  ]
-}
+# Submit a new roast to Artifact Registry
+gcloud builds submit --region=us-central1 --tag us-west2-docker.pkg.dev/PROJECT_ID/repo/image:tag1
 ```
 
-Create the config
-```bash
-curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
- -H "Content-Type: application/json" \
- -d @config.json \
-"https://workstations.googleapis.com/v1beta/projects/${PROJECT}/locations/us-central1/workstationClusters/my-cluster/workstationConfigs?workstation_config_id=my-config"
+---
 
-```
+### 💻 The Barista (Developer Persona)
 
-Check its running -> `reconciling: true` is a good sign
-```bash
-curl -H "Authorization: Bearer $(gcloud auth print-access-token)" \
- -H "Content-Type: application/json" \
-"https://workstations.googleapis.com/v1beta/projects/${PROJECT}/locations/us-central1/workstationClusters/my-cluster/workstationConfigs/my-config"
-
-```
-
-### Customisation 
-To customise the workstation image and config follow [here](./custom.md).
-
-### Platfrom Engineer Persona
-Maintaining an organisation base workstation image.
-
-```
-gcloud config set project <project>
-gcloud login auth
-```
+#### SSH Access (The Private Tasting Room)
+Need to get close to the metal? Create a secure tunnel:
 
 ```bash
-gcloud builds submit --region=us-central1 --tag us-west2-docker.pkg.dev/PROJECT_ID/quickstart-docker-repo/quickstart-image:tag1
-#gcloud builds submit --region=us-central1 --tag europe-docker.pkg.dev/coffee-plantation/workstation/codeoss
-```
-To test the image locally
-
-```bash
-docker run -p 8080:80 gcr.io/cloud-workstations-external/mycustomimage:latest
+gcloud alpha workstations start-tcp-tunnel \
+    --project=${PROJECT} --region=us-central1 \
+    --cluster=my-cluster --config=my-config \
+    my-workstation 22 --local-host-port=:2222
 ```
 
+Then simply: `ssh user@localhost -p 2222`
 
-### Developer Persona
+---
 
-#### SSH Access
+## 🔄 CI/CD Workflow: The Automatic Grinder
 
-Create a tunnel 
-```bash
-gcloud alpha workstations start-tcp-tunnel --project=${PROJECT} --region=us-central1 --cluster=my-cluster --config=my-config my-workstation 22 --local-host-port=:2222
-
-```
-
-`ssh user@localhost -p 2222` or `ssh user@127.0.0.1 -p 2222`
-
-`gcloud workstations ssh`
-
-"Remote - SSH" Plugin on local IDE
-
-
-## Contributing
-If you would like to contribute to the CloudWorkstations repository, you can:
-
-* Fork the repository to your own GitHub account.
-* Make changes to the code.
-* Submit a pull request to the CloudWorkstations repository.
-
-
-
-# Notes
-Customise the workstation
-Machine Settings: Settings that apply globally when you connect to a Cloud Workstations virtual instance and that appear on your workstation in the $HOME/.codeoss-cloudworkstations/settings.json file.
-
-User Settings: Settings that apply globally when you connect to a Cloud Workstations virtual instance and that persist in browser storage for each workstation instance.
-
-Workspace Settings: Settings stored inside a workspace that only apply when opening that workspace. These settings appear with your workspace files in the $WORKSPACE_ROOT/.vscode/settings.json file.
-
-"User" level settings which are written to browser indexed db storage per origin, "Host" level settings are stored on the VM under $HOME/.codeoss-workstations/data/Machine/settings.json, and "Workspace" settings are stored under $WORKSPACE_ROOT/.vscode/settings.json. Overridden settings are resolved in the aforementioned order (User, Machine, Workspace), so If users wish to configure settings at image startup time they should be able to just write them to $HOME/.codeoss-workstations/data/Machine/settings.json.
-$HOME/.codeoss-cloudworkstations instead of /.codeoss-workstations
-
-
-
-
-The image is automatically built with Cloud Build to get the latest changes to the base Code OSS image, and the Cloud Workstations configuration is updated to use the latest tag. The process is triggered by a repository push event and images are stored in an Artifact Registry repository.
-
-## CI/CD Workflow
-
-This project uses Google Cloud Build for continuous integration and delivery of the custom Workstation image.
+We use **Google Cloud Build** to ensure your beans are always fresh.
 
 ### 🚀 Automation & Triggers
-The CI/CD pipeline is hosted in the GCP project `<YOUR_GCP_PROJECT_ID>`.
+Our pipeline lives in the GCP project `coffee-plantation`.
 
 | Event | Action | Outcome |
 | :--- | :--- | :--- |
-| **Commit to Branch / Raise PR** | *No automatic action* | PRs currently do not have pre-merge validation. |
-| **Merge to `main` branch** | Triggers Cloud Build | Rebuilds the custom Code OSS image and pushes to Artifact Registry. |
+| **Commit to Branch / PR** | *No automatic action* | Verification builds are currently manual. |
+| **Merge to `main`** | Triggers Cloud Build | Rebuilds the custom Code OSS image and pushes to Artifact Registry. |
 
 ### 🛠️ Build Process (`cloudbuild-workstations.yaml`)
-The build uses **Kaniko** to create the container image without requiring a Docker daemon.
+Using **Kaniko** for a clean, daemon-less build:
+1.  **Context**: Builds relative to the `CloudWorkstations/` directory.
+2.  **Caching**: Layer caching enabled (24h) for lightning-fast updates.
+3.  **Storage**: Pushed to `europe-docker.pkg.dev/coffee-plantation/workstation/codeoss:latest`.
 
-1.  **Context Resolution:** The build context is set to the `CloudWorkstations/` directory so all `COPY` commands in the Dockerfile resolve correctly.
-2.  **Layer Caching:** Kaniko caches image layers for 24 hours to ensure fast subsequent builds.
-3.  **Artifact Storage:** The final image is pushed to:
-    ```
-    europe-docker.pkg.dev/<YOUR_GCP_PROJECT_ID>/workstation/codeoss:latest
-    ```
+---
 
-### 💡 Post-Deployment
-Once the image is updated in the Artifact Registry, any Cloud Workstation configuration referencing the `:latest` tag will automatically provision new workstations using the updated image. Existing workstations will pick up the changes upon their next rebuild/restart depending on your workstation configuration settings.
+## 🎨 Customization: Personalize Your Cup
 
-# Setup Cloud Workstations
-You will find the automation to stand up a new Google Cloud Workstation project in [./Automations](./Automation/tf/)
+Want to tweak your environment? Check out the **[Customization Guide](./custom.md)** to learn about:
+*   **Machine Settings**: Global VM settings stored in `$HOME/.codeoss-cloudworkstations/settings.json`.
+*   **YADM Dotfiles**: How we pull your personal config from GitHub on every start.
+*   **Starship & Zsh**: Serving up a beautiful, informative terminal.
+
+---
+
+Built with ❤️ and ☕. Keep brewing!
