@@ -81,21 +81,17 @@ set -e # bail out early if any command fails
 set -u # fail if we hit unset variables
 set -o pipefail # fail if any component of any pipe fails
 
-runuser user -c 'touch ~/.rob'
-runuser user -c 'mkdir /home/user/workspace'
+runuser user -c 'mkdir -p /home/user/workspace'
 
-echo 'cleaning up previous installs'
-runuser user -c 'rm -rf /home/user/.oh-my-zsh/'
+echo 'cloning dotfiles with yadm'
+runuser user -c 'yadm clone https://github.com/sapientcoffee/dotfiles.git'
 
-echo 'install oh-my-zsh'
-runuser user -c 'sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended'
-echo 'install powerlevel10 theme'
-runuser user -c 'git clone https://github.com/romkatv/powerlevel10k.git /home/user/.oh-my-zsh/custom/themes/powerlevel10k'
-
-echo 'Copy IDE settings and terminal settings'
+echo 'Copy IDE settings to correct location'
+runuser user -c 'mkdir -p /home/user/.codeoss-cloudworkstations/data/Machine/'
 runuser user -c 'cp /sapientcoffee/settings/settings.json /home/user/.codeoss-cloudworkstations/data/Machine/'
-runuser user -c 'cp /sapientcoffee/settings/p10k.zsh /home/user/.p10k.zsh'
-runuser user -c 'cp /sapientcoffee/settings/zshrc /home/user/.zshrc'
+
+echo 'running setup script'
+runuser user -c '/sapientcoffee/scripts/setup.sh'
 
 echo 'set zsh as default'
 runuser user -c 'echo "exec zsh" >> /home/user/.bashrc'
@@ -106,16 +102,15 @@ To make these files available, I added them to the container image in a special 
 ```
 # Customisation of terminal (zsh, themes and layout)
 RUN mkdir -p /sapientcoffee/settings /sapientcoffee/scripts
-COPY CloudWorkstations/settings.json CloudWorkstations/p10k.zsh CloudWorkstations/zshrc /sapientcoffee/settings/
-COPY CloudWorkstations/custom.sh /etc/workstation-startup.d/200_custom.sh
-COPY CloudWorkstations/custom.sh /sapientcoffee/scripts/custom.sh
-RUN chmod +x /etc/workstation-startup.d/200_custom.sh /sapientcoffee/scripts/custom.sh
+COPY CloudWorkstations/settings.json /sapientcoffee/settings/
+COPY CloudWorkstations/200_custom.sh /etc/workstation-startup.d/200_custom.sh
+COPY CloudWorkstations/200_custom.sh /sapientcoffee/scripts/200_custom.sh
+COPY CloudWorkstations/setup.sh /sapientcoffee/scripts/setup.sh
+RUN chmod +x /etc/workstation-startup.d/200_custom.sh /sapientcoffee/scripts/200_custom.sh /sapientcoffee/scripts/setup.sh
 ```
 
 What is the purpose of each file?
-[`.p10k.zsh`] Terminal prompt configuration that is imported into the container image and transferred to the home directory via custom.sh to customise zsh with the [Powerlevel](https://github.com/romkatv/powerlevel10k) framework.
 [`settings.json`] The Code OSS settings to customise the look and feel of the IDE interface (e.g. dark theme, enable DuetAI etc.). Transferred to the workstation container image and copied to the correct location by custom.sh at deployment time.
-[`.zshrc`] Zsh configuration that is transferred to the workstation container image and then copied to the correct location by custom.sh at deployment time.
 
 That's it! I've got a sweet, personalised cloud development environment ready to rock. I'd love to hear about your own customisation adventures. Maybe you can help me level up even further? I'm thinking of adding a script that configures individual user settings with a CLI wizard (think `git config`) upon the first start. You can keep track in my [Github repo](https://github.com/sapientcoffee/platform-ops). Let's keep the coding excitement alive! 🚀💻✨
 

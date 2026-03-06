@@ -14,9 +14,7 @@ The CloudWorkstations directory contains the following files and directories:
 * [cloudbuild-worksations.yaml](./cloudbuild-workstations.yaml): Cloud Build Manifest to build the Workstation image and store in Artifact Registry (things are hardcoded at the moment). Can be used in conjunction with a trigger that will automatically update the Workstation container image upon changes to the repo.
 * [custom.sh](./custom.sh): Script that is loaded into the Workstation image that is run at creation time to customise the configuration.
 * [Dockerfile](./Dockerfile): Defintion to create the workstation container image.
-* [p10k.zsh](./p10k.zsh): Terminal prompt configuration that is imported into the container image and transfered to the home directory via custom.sh to customse zsh with [powerlevel10K](https://github.com/romkatv/powerlevel10k) theme.
 * [settings.json](./settings.json): The Code OSS settings to customise the look at feel of the IDE interface (e.g. dark theme, enable DuetAI etc.). Transfered to the workstation container imange and the copied to the correct location by custom.sh at deplyment time.
-* [zshrc](./zshrc): Zsh configuration that is transfered to the workstation container imange and the copied to the correct location by custom.sh at deplyment time.
 
 
 ## Getting Started
