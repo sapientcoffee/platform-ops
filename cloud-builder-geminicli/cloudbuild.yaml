@@ -14,6 +14,7 @@ steps:
   - name: 'us-docker.pkg.dev/coffee-plantation/cloud-build-builder/gemini-builder:latest'
     id: 'smoke-test-gemini'
     dir: 'cloud-builder-geminicli'
+    env: ['HOME=/gemini-home']
     args: ['--version']
 
 images:

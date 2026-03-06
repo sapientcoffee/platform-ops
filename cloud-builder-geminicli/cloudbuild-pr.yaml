@@ -14,6 +14,7 @@ steps:
   - name: 'us-docker.pkg.dev/coffee-plantation/cloud-build-builder/gemini-builder:$SHORT_SHA'
     id: 'smoke-test-gemini'
     dir: 'cloud-builder-geminicli'
+    env: ['HOME=/gemini-home']
     args: ['--version']
 
 # Note: We do NOT include the 'images' section here to avoid pushing to the registry 
