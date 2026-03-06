@@ -44,4 +44,20 @@ steps:
 
 ### Authentication
 
-The builder will use the Cloud Build service account's credentials. Ensure that the service account has the necessary permissions (e.g., Vertex AI User) to use Gemini.
+The builder will use the Cloud Build service account's credentials. To use the tool in a non-interactive environment like Cloud Build, you should specify the authentication backend using environment variables:
+
+- `GOOGLE_GENAI_USE_VERTEXAI=true`: Recommended for most Cloud Build jobs. Ensure the service account has the `Vertex AI User` role.
+- `GOOGLE_GENAI_USE_GCA=true`: Uses Gemini Cloud Assist backend.
+
+## Testing the Image
+
+You can verify the image is working correctly by running a one-off Cloud Build job:
+
+```bash
+gcloud builds submit --project=coffee-plantation --config=<(echo '
+steps:
+- name: "us-docker.pkg.dev/coffee-plantation/cloud-build-builder/gemini-builder:latest"
+  env: ["GOOGLE_GENAI_USE_VERTEXAI=true"]
+  args: ["Explain Cloud Build in one sentence."]
+')
+```
