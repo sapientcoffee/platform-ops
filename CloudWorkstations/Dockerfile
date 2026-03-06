@@ -1,5 +1,5 @@
 
-FROM us-central1-docker.pkg.dev/cloud-workstations-images/predefined/code-oss:latest
+FROM us-central1-docker.pkg.dev/cloud-workstations-images/predefined/code-oss:code-oss-1.89.1
 ARG TERRAFORM_VERSION=1.14.6
 
 # Install tooling
