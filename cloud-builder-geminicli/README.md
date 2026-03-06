@@ -1,4 +1,4 @@
-# Cloud Builder: geminicli-builder
+# Cloud Builder: gemini-builder
 
 This is a custom Google Cloud Build builder image that contains the `gemini` CLI tool. It is based on the official `google-cloud-cli` image, adding Node.js and the `@google/gemini-cli` package.
 
@@ -10,7 +10,6 @@ This is a custom Google Cloud Build builder image that contains the `gemini` CLI
   - `node` (v20.x)
   - `npm` (latest)
   - `gemini` (preview)
-  - `geminicli` (alias for `gemini`)
 
 ## Building the Image
 
@@ -21,7 +20,7 @@ gcloud builds submit --config cloudbuild.yaml .
 ```
 
 The image will be tagged as:
-`us-docker.pkg.dev/coffee-plantation/cloud-build-builder/geminicli-builder:latest`
+`us-docker.pkg.dev/coffee-plantation/cloud-build-builder/gemini-builder:latest`
 
 ## Using it in Cloud Build
 
@@ -31,7 +30,7 @@ You can use this builder in your other Cloud Build jobs by referencing its image
 
 ```yaml
 steps:
-- name: 'us-docker.pkg.dev/coffee-plantation/cloud-build-builder/geminicli-builder'
+- name: 'us-docker.pkg.dev/coffee-plantation/cloud-build-builder/gemini-builder'
   args: ['Explain why I should use Gemini CLI for platform operations.']
 ```
 
@@ -39,7 +38,7 @@ steps:
 
 ```yaml
 steps:
-- name: 'us-docker.pkg.dev/coffee-plantation/cloud-build-builder/geminicli-builder'
+- name: 'us-docker.pkg.dev/coffee-plantation/cloud-build-builder/gemini-builder'
   args: ['-y', 'Update the license header in all src/*.py files to Apache 2.0.']
 ```
 

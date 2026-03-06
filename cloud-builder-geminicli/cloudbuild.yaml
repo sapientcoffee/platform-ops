@@ -4,23 +4,17 @@ steps:
     id: 'build'
     args:
       - 'build'
-      - '--tag=us-docker.pkg.dev/coffee-plantation/cloud-build-builder/geminicli-builder:latest'
+      - '--tag=us-docker.pkg.dev/coffee-plantation/cloud-build-builder/gemini-builder:latest'
       - '-f'
       - 'Dockerfile'
       - '.'
 
   # Smoke test: check version
-  - name: 'us-docker.pkg.dev/coffee-plantation/cloud-build-builder/geminicli-builder:latest'
+  - name: 'us-docker.pkg.dev/coffee-plantation/cloud-build-builder/gemini-builder:latest'
     id: 'smoke-test-gemini'
     args: ['--version']
 
-  # Smoke test: check geminicli alias
-  - name: 'us-docker.pkg.dev/coffee-plantation/cloud-build-builder/geminicli-builder:latest'
-    id: 'smoke-test-geminicli'
-    entrypoint: '/usr/bin/geminicli'
-    args: ['--version']
-
 images:
-  - 'us-docker.pkg.dev/coffee-plantation/cloud-build-builder/geminicli-builder:latest'
+  - 'us-docker.pkg.dev/coffee-plantation/cloud-build-builder/gemini-builder:latest'
 
 timeout: '1200s'
