@@ -13,7 +13,6 @@ steps:
   # Smoke test: check version using the SHA-tagged image
   - name: 'us-docker.pkg.dev/coffee-plantation/cloud-build-builder/gemini-builder:$SHORT_SHA'
     id: 'smoke-test-gemini'
-    dir: 'cloud-builder-geminicli'
     env: ['HOME=/gemini-config']
     args: ['--version']
 
