@@ -42,14 +42,28 @@ steps:
   args: ['-y', 'Update the license header in all src/*.py files to Apache 2.0.']
 ```
 
-### Authentication
+### Option 1: Using Vertex AI (Google Cloud Native)
 
-The builder will use the Cloud Build service account's credentials. To use the tool in a non-interactive environment like Cloud Build, you should specify the authentication backend using environment variables:
+Recommended when running within GCP. The builder will use the Cloud Build service account's credentials.
 
-- `GOOGLE_GENAI_USE_VERTEXAI=true`: Recommended for most Cloud Build jobs. Ensure the Cloud Build service account (e.g., `PROJECT_NUMBER@cloudbuild.gserviceaccount.com`) has the **Vertex AI User** role (`roles/aiplatform.user`) in the target project.
-- `GOOGLE_GENAI_USE_GCA=true`: Uses Gemini Cloud Assist backend.
+- `GOOGLE_GENAI_USE_VERTEXAI=true`: Required. Ensure the service account (e.g., `PROJECT_NUMBER@cloudbuild.gserviceaccount.com`) has the **Vertex AI User** role.
+- `GOOGLE_CLOUD_PROJECT`: The project ID.
+- `GOOGLE_CLOUD_LOCATION`: The region (e.g., `us-central1`).
 
-### Required Environment Variables
+### Option 2: Using an API Key (Universal/Multi-Platform)
+
+Recommended for maximum portability (e.g., GitHub Actions, GitLab CI, or local testing). Obtain a key from [Google AI Studio](https://aistudio.google.com/).
+
+- `GEMINI_API_KEY`: Your secret API key.
+
+**Example (Universal Docker Run):**
+```bash
+docker run -e GEMINI_API_KEY=$MY_KEY \
+  us-docker.pkg.dev/coffee-plantation/cloud-build-builder/gemini-builder:latest \
+  "Review the code in the current directory."
+```
+
+### Required Environment Variables (Vertex AI Only)
 
 When using Vertex AI, you must provide the project and location:
 - `GOOGLE_CLOUD_PROJECT`: The project ID where Vertex AI API is enabled.
