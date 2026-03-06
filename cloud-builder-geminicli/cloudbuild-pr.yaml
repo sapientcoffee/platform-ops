@@ -1,0 +1,29 @@
+steps:
+  # Build the image (without pushing it as 'latest')
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build'
+    args:
+      - 'build'
+      - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/geminicli-builder:$SHORT_SHA'
+      - '-f'
+      - 'cloud-builder-geminicli/Dockerfile'
+      - 'cloud-builder-geminicli/.'
+
+  # Smoke test: check version using the SHA-tagged image
+  - name: 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/geminicli-builder:$SHORT_SHA'
+    id: 'smoke-test-gemini'
+    args: ['--version']
+
+  # Smoke test: check geminicli alias
+  - name: 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/geminicli-builder:$SHORT_SHA'
+    id: 'smoke-test-geminicli'
+    entrypoint: 'geminicli'
+    args: ['--version']
+
+# Note: We do NOT include the 'images' section here to avoid pushing to the registry 
+# automatically on PRs. If you want to push the PR build for debugging or testing,
+# you can uncomment the following lines.
+# images:
+#   - 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/geminicli-builder:$SHORT_SHA'
+
+timeout: '1200s'
