@@ -56,9 +56,17 @@ When using Vertex AI, you must provide the project and location:
 - `GOOGLE_CLOUD_LOCATION`: The region (e.g., `us-central1`).
 - `GEMINI_MODEL`: (Optional) The model to use (e.g., `gemini-3.1-pro-preview`). Defaults to the CLI's internal default if not set.
 
-## Testing the Image
+## Troubleshooting
 
-You can verify the image is working correctly by running a one-off Cloud Build job. This example uses an environment variable to pass the model version to the `-m` flag:
+### ModelNotFoundError
+
+If you see `ModelNotFoundError`, it means the specific model name is either incorrect for the chosen region or your project doesn't have access to it.
+
+1.  **Verify Model Name:** Check the [Vertex AI Model Garden](https://console.cloud.google.com/vertex-ai/model-garden) in the Google Cloud Console to find the exact model ID available in your region.
+2.  **Enable Model:** Some preview models (like `gemini-3.1-pro-preview`) may require you to "Enable" or "Agree to terms" in the Model Garden before they can be used via API.
+3.  **Check Region:** Ensure the `GOOGLE_CLOUD_LOCATION` matches a region where the model is deployed.
+
+Example test with a model ID found in the console:
 
 ```bash
 gcloud builds submit --project=coffee-plantation --config=<(echo '
@@ -67,11 +75,8 @@ steps:
   env: [
     "GOOGLE_GENAI_USE_VERTEXAI=true",
     "GOOGLE_CLOUD_PROJECT=coffee-plantation",
-    "GOOGLE_CLOUD_LOCATION=us-central1",
-    "MODEL=gemini-3.1-pro-preview"
+    "GOOGLE_CLOUD_LOCATION=us-central1"
   ]
-  args: ["-m", "$_MODEL", "Explain Cloud Build in one sentence."]
+  args: ["-m", "gemini-1.5-flash-001", "Explain Cloud Build in one sentence."]
 ')
 ```
-
-> **Note:** In Cloud Build, to use a variable defined in `env` within `args`, you can use the standard shell variable syntax. However, for a more robust experience, the builder also natively supports the `GEMINI_MODEL` environment variable.
