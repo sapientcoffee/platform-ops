@@ -12,9 +12,8 @@ RUN apt-get update && \
 # Install @google/gemini-cli globally
 RUN npm install -g @google/gemini-cli@preview
 
-# Create a world-writable config directory and initialize projects.json with valid JSON
+# Create a world-writable config directory
 RUN mkdir -p /gemini-config/.gemini && \
-    echo "{}" > /gemini-config/.gemini/projects.json && \
     chmod -R 777 /gemini-config
 
 # Force gemini-cli to use this directory by setting HOME
