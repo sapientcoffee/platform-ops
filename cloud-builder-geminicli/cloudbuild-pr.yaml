@@ -21,9 +21,9 @@ steps:
     args: ['--version']
 
 # Note: We do NOT include the 'images' section here to avoid pushing to the registry 
-# automatically on PRs, or we can push with the $SHORT_SHA for debugging.
-# If you want to push the PR build for testing:
-images:
-  - 'europe-docker.pkg.dev/$PROJECT_ID/codey-builder-image/geminicli-builder:$SHORT_SHA'
+# automatically on PRs. If you want to push the PR build for debugging or testing,
+# you can uncomment the following lines.
+# images:
+#   - 'europe-docker.pkg.dev/$PROJECT_ID/codey-builder-image/geminicli-builder:$SHORT_SHA'
 
 timeout: '1200s'
