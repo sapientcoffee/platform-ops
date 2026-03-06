@@ -33,3 +33,5 @@ steps:
 timeout: '3600s'
 options:
   logging: CLOUD_LOGGING_ONLY
+  logsBucket: 'gs://coffee-plantation_cloudbuild/logs'
+  logStreamingOption: STREAM_ON
