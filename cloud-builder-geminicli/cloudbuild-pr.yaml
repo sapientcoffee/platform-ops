@@ -4,18 +4,18 @@ steps:
     id: 'build'
     args:
       - 'build'
-      - '--tag=europe-docker.pkg.dev/coffee-plantation/workstation/geminicli-builder:$SHORT_SHA'
+      - '--tag=us-docker.pkg.dev/coffee-plantation/cloud-build-builder/geminicli-builder:$SHORT_SHA'
       - '-f'
       - 'Dockerfile'
       - '.'
 
   # Smoke test: check version using the SHA-tagged image
-  - name: 'europe-docker.pkg.dev/coffee-plantation/workstation/geminicli-builder:$SHORT_SHA'
+  - name: 'us-docker.pkg.dev/coffee-plantation/cloud-build-builder/geminicli-builder:$SHORT_SHA'
     id: 'smoke-test-gemini'
     args: ['--version']
 
   # Smoke test: check geminicli alias
-  - name: 'europe-docker.pkg.dev/coffee-plantation/workstation/geminicli-builder:$SHORT_SHA'
+  - name: 'us-docker.pkg.dev/coffee-plantation/cloud-build-builder/geminicli-builder:$SHORT_SHA'
     id: 'smoke-test-geminicli'
     entrypoint: 'geminicli'
     args: ['--version']
@@ -24,6 +24,6 @@ steps:
 # automatically on PRs. If you want to push the PR build for debugging or testing,
 # you can uncomment the following lines.
 # images:
-#   - 'europe-docker.pkg.dev/coffee-plantation/workstation/geminicli-builder:$SHORT_SHA'
+#   - 'us-docker.pkg.dev/coffee-plantation/cloud-build-builder/geminicli-builder:$SHORT_SHA'
 
 timeout: '1200s'
