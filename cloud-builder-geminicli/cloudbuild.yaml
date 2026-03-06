@@ -17,7 +17,7 @@ steps:
   # Smoke test: check geminicli alias
   - name: 'us-docker.pkg.dev/coffee-plantation/cloud-build-builder/geminicli-builder:latest'
     id: 'smoke-test-geminicli'
-    entrypoint: 'geminicli'
+    entrypoint: '/usr/bin/geminicli'
     args: ['--version']
 
 images:

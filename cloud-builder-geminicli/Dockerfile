@@ -13,7 +13,7 @@ RUN apt-get update && \
 RUN npm install -g @google/gemini-cli@preview
 
 # Create a symlink for 'geminicli' as well, since it's a common alias/expectation
-RUN ln -s /usr/local/bin/gemini /usr/bin/geminicli
+RUN ln -sf /usr/local/bin/gemini /usr/bin/geminicli
 
 # Default entrypoint is gemini
 ENTRYPOINT ["gemini"]
