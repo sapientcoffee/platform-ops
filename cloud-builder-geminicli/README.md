@@ -58,7 +58,7 @@ When using Vertex AI, you must provide the project and location:
 
 ## Testing the Image
 
-You can verify the image is working correctly by running a one-off Cloud Build job:
+You can verify the image is working correctly by running a one-off Cloud Build job. This example uses an environment variable to pass the model version to the `-m` flag:
 
 ```bash
 gcloud builds submit --project=coffee-plantation --config=<(echo '
@@ -68,8 +68,10 @@ steps:
     "GOOGLE_GENAI_USE_VERTEXAI=true",
     "GOOGLE_CLOUD_PROJECT=coffee-plantation",
     "GOOGLE_CLOUD_LOCATION=us-central1",
-    "GEMINI_MODEL=gemini-1.5-flash"
+    "MODEL=gemini-3.1-pro-preview"
   ]
-  args: ["Explain Cloud Build in one sentence."]
+  args: ["-m", "$_MODEL", "Explain Cloud Build in one sentence."]
 ')
 ```
+
+> **Note:** In Cloud Build, to use a variable defined in `env` within `args`, you can use the standard shell variable syntax. However, for a more robust experience, the builder also natively supports the `GEMINI_MODEL` environment variable.
