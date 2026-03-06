@@ -12,8 +12,8 @@ RUN apt-get update && \
 # Install @google/gemini-cli globally
 RUN npm install -g @google/gemini-cli@preview
 
-# Use a custom home directory to avoid conflicts with Cloud Build's managed /builder/home volume
-RUN mkdir -p /gemini-home && chmod 777 /gemini-home
+# Use a custom home directory and pre-create the .gemini config folder to avoid ENOENT rename errors
+RUN mkdir -p /gemini-home/.gemini && chmod -R 777 /gemini-home
 ENV HOME=/gemini-home
 
 # Default entrypoint is gemini
