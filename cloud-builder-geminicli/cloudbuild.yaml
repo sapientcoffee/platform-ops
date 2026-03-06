@@ -4,23 +4,23 @@ steps:
     id: 'build'
     args:
       - 'build'
-      - '--tag=europe-docker.pkg.dev/$PROJECT_ID/codey-builder-image/geminicli-builder:latest'
+      - '--tag=us-docker.pkg.dev/$PROJECT_ID/gcr.io/geminicli-builder:latest'
       - '-f'
       - 'cloud-builder-geminicli/Dockerfile'
       - 'cloud-builder-geminicli/.'
 
   # Smoke test: check version
-  - name: 'europe-docker.pkg.dev/$PROJECT_ID/codey-builder-image/geminicli-builder:latest'
+  - name: 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/geminicli-builder:latest'
     id: 'smoke-test-gemini'
     args: ['--version']
 
   # Smoke test: check geminicli alias
-  - name: 'europe-docker.pkg.dev/$PROJECT_ID/codey-builder-image/geminicli-builder:latest'
+  - name: 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/geminicli-builder:latest'
     id: 'smoke-test-geminicli'
     entrypoint: 'geminicli'
     args: ['--version']
 
 images:
-  - 'europe-docker.pkg.dev/$PROJECT_ID/codey-builder-image/geminicli-builder:latest'
+  - 'us-docker.pkg.dev/$PROJECT_ID/gcr.io/geminicli-builder:latest'
 
 timeout: '1200s'
