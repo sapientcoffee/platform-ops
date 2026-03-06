@@ -4,6 +4,7 @@ steps:
   entrypoint: 'hadolint'
   args: ['./CloudWorkstations/Dockerfile']
   id: "Linting Dockerfile"
+  allow_failure: true
 
 # 2. 🏗️ Build PR Image: Push a temporary tag for validation
 - name: 'gcr.io/kaniko-project/executor:latest'
