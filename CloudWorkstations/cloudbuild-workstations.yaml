@@ -1,26 +1,41 @@
 steps:
+# 1. 🛡️ Linting: Catch common Dockerfile mistakes early
+- name: 'hadolint/hadolint:latest-debian'
+  entrypoint: 'hadolint'
+  args: ['./CloudWorkstations/Dockerfile']
+  id: "Linting Dockerfile"
+
+# 2. 🏗️ Build & Multi-Tag: Build once, tag twice (Latest + Git SHA)
 - name: 'gcr.io/kaniko-project/executor:latest'
   args: [
-    "--destination=europe-docker.pkg.dev/coffee-plantation/workstation/codeoss",
+    "--destination=europe-docker.pkg.dev/coffee-plantation/workstation/codeoss:latest",
+    "--destination=europe-docker.pkg.dev/coffee-plantation/workstation/codeoss:$COMMIT_SHA",
     "--dockerfile=./CloudWorkstations/Dockerfile",
     "--context=dir:///workspace/CloudWorkstations",
     "--cache=true",
     "--cache-ttl=24h"]
-  id: "Creating a Google Cloud Workstations Image"
+  id: "Building & Tagging Image"
 
-# # Simple sanity check: invoke the new gcloud container to confirm that it was built correctly.
-# - name: 'europe-docker.pkg.dev/coffee-plantation/workstation/codeoss:latest'
-#   args: ['terraform', '-v']
-#   id: Sanity Check - terraform 
+# 3. 🧪 Smoke Tests: Ensure the "brew" actually tastes right
+- name: 'europe-docker.pkg.dev/coffee-plantation/workstation/codeoss:$COMMIT_SHA'
+  entrypoint: 'zsh'
+  args: 
+    - '-c'
+    - |
+      set -e
+      echo "Running Smoke Tests..."
+      terraform --version
+      yadm --version
+      kustomize version
+      firebase --version
+      echo "✅ All tools verified!"
+  id: "Sanity Check - Tooling"
 
-# # Simple sanity check: invoke the new gcloud container to confirm that it was built correctly.
-# - name: 'europe-docker.pkg.dev/coffee-plantation/workstation/codeoss:latest'
-#   args: ['firebase', '--version']
-#   id: Sanity Check - firebase 
+# 4. 🔍 Security Scan: Check for vulnerabilities in the final roast
+- name: 'aquasec/trivy:latest'
+  args: ['image', '--severity', 'HIGH,CRITICAL', '--exit-code', '0', 'europe-docker.pkg.dev/coffee-plantation/workstation/codeoss:$COMMIT_SHA']
+  id: "Vulnerability Scan"
 
-# # # Confirm that auth is piped through correctly.
-# - name: 'gcr.io/$PROJECT_ID/gcloud'
-#   args: ['builds', 'list']
-#   id: Confirm auth is pipled through
-  
 timeout: '3600s'
+options:
+  logging: CLOUD_LOGGING_ONLY
