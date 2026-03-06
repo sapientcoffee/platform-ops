@@ -4,7 +4,7 @@ ARG TERRAFORM_VERSION=1.14.6
 
 # Install tooling
 RUN set -eux; \
-    apt-get update; \
+    apt-get update || true; \
     apt-get install -y nodejs zsh tmux neovim ripgrep fd-find git; \
     \
     # yadm
