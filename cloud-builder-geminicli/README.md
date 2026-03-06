@@ -4,9 +4,9 @@ This is a custom Google Cloud Build builder image that contains the `gemini` CLI
 
 ## Features
 
-- **Base Image:** `gcr.io/google.com/cloudsdktool/google-cloud-cli:latest`
+- **Base Image:** `gcr.io/google.com/cloudsdktool/google-cloud-cli:559.0.0-debian_component_based`
 - **Tools:**
-  - `gcloud` (latest)
+  - `gcloud` (559.0.0)
   - `node` (v20.x)
   - `npm` (latest)
   - `gemini` (preview)

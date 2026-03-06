@@ -1,5 +1,5 @@
-# Use the Google Cloud SDK base image
-FROM gcr.io/google.com/cloudsdktool/google-cloud-cli:latest
+# Use a pinned version of the Google Cloud SDK base image
+FROM gcr.io/google.com/cloudsdktool/google-cloud-cli:559.0.0-debian_component_based
 
 # Install Node.js (needed for gemini-cli)
 RUN apt-get update && \
