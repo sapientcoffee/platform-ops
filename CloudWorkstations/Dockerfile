@@ -20,7 +20,7 @@ RUN set -eux; \
     \
     # Kustomize
     curl -s -o install_kustomize.sh "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"; \
-    bash install_kustomize.sh; \
+    bash install_kustomize.sh /usr/local/bin; \
     rm install_kustomize.sh; \
     \
     # Firebase CLI
