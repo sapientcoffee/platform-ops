@@ -1,5 +1,8 @@
 # Cloud Builder: gemini-builder
 
+> [!WARNING]
+> **Work in Progress:** This builder is currently under development. There are known issues regarding Vertex AI model resolution (ModelNotFoundError) that are being investigated. The API Key method is the recommended stable path for now.
+
 This is a custom Google Cloud Build builder image that contains the `gemini` CLI tool. It is based on the official `google-cloud-cli` image, adding Node.js and the `@google/gemini-cli` package.
 
 ## Features
