@@ -273,13 +273,13 @@ steps:
 
 timeout: 7200s
 substitutions:
-  _REPO_URL: 'https://github.com/sapientcoffee/platform-ops.git'
-  _REGION: 'us-central1'
-  _WEBHOOK_URL: ''
-  _EMAIL_FUNC_URL: ''
-  _EMAIL: ''
-  _USER_ACCOUNT: ''
-  _PROFILE: 'full'
+  _CB_REPO_URL: 'https://github.com/sapientcoffee/platform-ops.git'
+  _CB_REGION: 'us-central1'
+  _CB_WEBHOOK_URL: ''
+  _CB_EMAIL_FUNC_URL: ''
+  _CB_EMAIL: ''
+  _CB_USER_ACCOUNT: ''
+  _CB_PROFILE: 'full'
 options:
   logging: CLOUD_LOGGING_ONLY
   machineType: 'E2_HIGHCPU_8'
@@ -289,9 +289,10 @@ BUILDEOF
     # Build the substitutions array — use gcloud's --substitutions flag carefully.
     # Webhook URLs contain & and = which are safe in Cloud Build substitution values
     # but must be properly quoted when passed via shell.
-    SUBS_ARGS=("_REPO_URL=${REPO_URL}" "_REGION=${REGION}" "_USER_ACCOUNT=${ACCOUNT}" "_PROFILE=${PROFILE}")
-    [ -n "$WEBHOOK_URL" ] && SUBS_ARGS+=("_WEBHOOK_URL=${WEBHOOK_URL}")
-    [ -n "$EMAIL_FUNCTION_URL" ] && SUBS_ARGS+=("_EMAIL_FUNC_URL=${EMAIL_FUNCTION_URL}" "_EMAIL=${EMAIL}")
+    local SUBS_ARGS=("_CB_REPO_URL=${REPO_URL}" "_CB_REGION=${REGION}" "_CB_USER_ACCOUNT=${ACCOUNT}" "_CB_PROFILE=${PROFILE}")
+    [ -n "$WEBHOOK_URL" ] && SUBS_ARGS+=("_CB_WEBHOOK_URL=${WEBHOOK_URL}")
+    [ -n "$EMAIL_FUNCTION_URL" ] && SUBS_ARGS+=("_CB_EMAIL_FUNC_URL=${EMAIL_FUNCTION_URL}" "_CB_EMAIL=${EMAIL}")
+
 
     # Join with commas
     SUBS_STR=$(IFS=,; echo "${SUBS_ARGS[*]}")
@@ -575,4 +576,6 @@ elif [ "$COMMAND" = "teardown" ]; then
     echo "============================================="
 
     notify_all "Teardown Complete" "Project: ${PROJECT_ID}" "All Cloud Workstation resources deleted."
+fi
+
 fi
