@@ -266,6 +266,8 @@ steps:
     args:
       - '-c'
       - |
+        ls -la /workspace
+        ls -la /workspace/repo || true
         cd /workspace/repo
         bash CloudWorkstations-Sway/scripts/cloud-build-setup.sh "${PROJECT_ID}" "${_REGION}" "${_WEBHOOK_URL}" "${_EMAIL_FUNC_URL}" "${_EMAIL}" "${_USER_ACCOUNT}" "${_PROFILE}"
     id: 'run-setup'
