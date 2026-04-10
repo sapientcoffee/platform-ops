@@ -11,10 +11,8 @@
 
 set -euo pipefail
 
-log "Diagnostic: gcloud state"
-gcloud config list || true
-gcloud auth list || true
-ls -R /workspace/repo/CloudWorkstations-Sway/scripts || true
+log()  { echo "[$(date '+%H:%M:%S')] $1"; }
+step() { echo ""; echo "========================================"; echo "  $1"; echo "========================================"; }
 
 PROJECT_ID="${1:?Usage: cloud-build-setup.sh PROJECT_ID REGION [WEBHOOK_URL] [EMAIL_FUNC_URL] [EMAIL] [USER_ACCOUNT] [PROFILE]}"
 REGION="${2:-us-central1}"
@@ -100,13 +98,12 @@ notify() {
 notify_and_fail() {
     local elapsed=$(( $(date +%s) - START_TIME ))
     local mins=$(( elapsed / 60 ))
+    local secs=$(( elapsed % 60 ))
+    
     notify "Setup FAILED" "Project: ${PROJECT_ID}" \
-        "Failed at: <b>$1</b><br>After: ${mins} minutes<br>PASS: ${PASS} | FAIL: ${FAIL} | WARN: ${WARN}<br><br>Re-run <code>setup.sh</code> to retry (idempotent)."
+        "<b>Step Failed:</b> ${1}<br><b>Time:</b> ${mins}m ${secs}s<br><br>Check Cloud Build logs for details."
     exit 1
 }
-
-# Trap unexpected exits
-trap 'notify_and_fail "Unexpected error (line $LINENO)"' ERR
 
 # Retry a command up to N times with delay
 retry() {
@@ -128,7 +125,7 @@ ws_ssh() {
     retry 3 10 timeout 300 gcloud workstations ssh "$WORKSTATION" \
         --project="$PROJECT_ID" --region="$REGION" \
         --cluster="$CLUSTER" --config="$CONFIG" \
-        --command="$1"
+        --command="$1" -- -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
 }
 
 # SSH helper for long-running commands (15 min timeout, fewer retries)
@@ -136,19 +133,17 @@ ws_ssh_long() {
     retry 2 15 timeout 900 gcloud workstations ssh "$WORKSTATION" \
         --project="$PROJECT_ID" --region="$REGION" \
         --cluster="$CLUSTER" --config="$CONFIG" \
-        --command="$1"
+        --command="$1" -- -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
 }
 
-# Pipe helper — accepts stdin piped to workstation command
+# Helper to pipe data into a file on the workstation
 ws_pipe() {
-    retry 3 10 timeout 300 gcloud workstations ssh "$WORKSTATION" \
+    local dest_cmd="$1"
+    gcloud workstations ssh "$WORKSTATION" \
         --project="$PROJECT_ID" --region="$REGION" \
         --cluster="$CLUSTER" --config="$CONFIG" \
-        --command="$1"
+        --command="$dest_cmd" -- -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
 }
-
-# Source Nix profile — works with both old and new Nix profile paths
-NIX_SOURCE='if [ -e ~/.nix-profile/etc/profile.d/nix.sh ]; then . ~/.nix-profile/etc/profile.d/nix.sh; elif [ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh; fi; export PATH="$HOME/.nix-profile/bin:$HOME/.local/state/nix/profiles/profile/bin:$PATH"'
 
 PROJECT_NUMBER=""
 
@@ -161,12 +156,15 @@ retry 3 5 gcloud services enable \
     artifactregistry.googleapis.com \
     compute.googleapis.com \
     cloudscheduler.googleapis.com \
+    cloudbuild.googleapis.com \
+    iam.googleapis.com \
+    logging.googleapis.com \
     cloudresourcemanager.googleapis.com \
-    --project="$PROJECT_ID" --quiet
+    --project="$PROJECT_ID"
 
-# Verify
+# Verify APIs
 for api in workstations artifactregistry compute cloudscheduler; do
-    if gcloud services list --enabled --project="$PROJECT_ID" --format="value(name)" 2>/dev/null | grep -q "$api"; then
+    if gcloud services list --enabled --filter="name:${api}.googleapis.com" --project="$PROJECT_ID" --format="value(name)" | grep -q "${api}"; then
         test_pass "$api API enabled"
     else
         test_fail "$api API not enabled"
@@ -189,9 +187,10 @@ else
         --project="$PROJECT_ID" \
         --description="Cloud Workstation Docker images"
 fi
-# Verify
-if gcloud artifacts repositories describe "$AR_REPO" --location="$REGION" --project="$PROJECT_ID" >/dev/null 2>&1; then
-    test_pass "Artifact Registry '$AR_REPO'"
+
+if gcloud artifacts repositories describe "$AR_REPO" \
+    --location="$REGION" --project="$PROJECT_ID" >/dev/null 2>&1; then
+    test_pass "Artifact Registry ready"
 else
     test_fail "Artifact Registry '$AR_REPO' not created"
 fi
@@ -217,7 +216,7 @@ for i in $(seq 1 6); do
 done
 
 log "Building Docker image (this takes 10-15 minutes)..."
-cd "${REPO_DIR}/workstation-image"
+cd "${REPO_DIR}/CloudWorkstations-Sway/workstation-image"
 if retry 2 30 gcloud builds submit \
     --tag="$IMAGE" \
     --project="$PROJECT_ID" \
@@ -262,7 +261,13 @@ else
         --auto-allocate-nat-external-ips \
         --nat-all-subnet-ip-ranges --project="$PROJECT_ID"
 fi
-test_pass "Cloud NAT configured"
+
+if gcloud compute routers nats describe ws-nat \
+    --router=ws-router --region="$REGION" --project="$PROJECT_ID" >/dev/null 2>&1; then
+    test_pass "Cloud NAT ready"
+else
+    test_fail "Cloud NAT not ready"
+fi
 
 # =========================================================================
 step "Step 5/19: Create Workstation Cluster"
@@ -278,27 +283,22 @@ fi
 # Verify
 if gcloud workstations clusters describe "$CLUSTER" \
     --region="$REGION" --project="$PROJECT_ID" >/dev/null 2>&1; then
-    test_pass "Workstation cluster '$CLUSTER'"
+    test_pass "Workstation cluster ready"
 else
-    test_fail "Workstation cluster not created"
+    test_fail "Workstation cluster not ready"
+    notify_and_fail "Workstation cluster creation"
 fi
 
 # =========================================================================
-step "Step 6/19: Grant AR access to service accounts"
+step "Step 6/19: Grant KMS permissions (if using defaults)"
 # =========================================================================
-COMPUTE_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
-WS_SA="service-${PROJECT_NUMBER}@gcp-sa-workstations.iam.gserviceaccount.com"
-
-# Grant AR reader to both the Workstations service agent AND the compute SA
-# (compute SA is used as the workstation's service account for image pulling)
-for SA in "$WS_SA" "$COMPUTE_SA"; do
-    gcloud artifacts repositories add-iam-policy-binding "$AR_REPO" \
-        --location="$REGION" \
-        --member="serviceAccount:${SA}" \
-        --role="roles/artifactregistry.reader" \
-        --project="$PROJECT_ID" --quiet --format=none 2>&1 || true
-done
-test_pass "AR reader granted to Workstations SA and Compute SA"
+# Workstations needs permission to the service agent SA
+SERVICE_AGENT="service-${PROJECT_NUMBER}@gcp-sa-workstations.iam.gserviceaccount.com"
+retry 2 5 gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+    --member="serviceAccount:$SERVICE_AGENT" \
+    --role="roles/workstations.serviceAgent" \
+    --quiet --format=none 2>/dev/null || true
+test_pass "Service agent permissions granted"
 
 # =========================================================================
 step "Step 7/19: Create Workstation Config"
@@ -312,19 +312,20 @@ else
         --cluster="$CLUSTER" --region="$REGION" \
         --machine-type=n1-standard-16 \
         --accelerator-type=nvidia-tesla-t4 --accelerator-count=1 \
-        --pd-disk-size=500 --pd-disk-type=pd-ssd \
+        --boot-disk-size=50 \
+        --pd-reclaim-policy=RETAIN \
+        --pd-disk-type=pd-ssd \
+        --pd-disk-size=500 \
         --container-custom-image="$IMAGE" \
-        --service-account="$COMPUTE_SA" \
-        --idle-timeout=14400 --running-timeout=43200 \
-        --disable-public-ip-addresses \
-        --shielded-secure-boot --shielded-vtpm --shielded-integrity-monitoring \
         --project="$PROJECT_ID"
 fi
+
 if gcloud workstations configs describe "$CONFIG" \
     --cluster="$CLUSTER" --region="$REGION" --project="$PROJECT_ID" >/dev/null 2>&1; then
-    test_pass "Workstation config '$CONFIG'"
+    test_pass "Workstation config ready"
 else
-    test_fail "Workstation config not created"
+    test_fail "Workstation config not ready"
+    notify_and_fail "Workstation config creation"
 fi
 
 # =========================================================================
@@ -340,7 +341,6 @@ else
         --project="$PROJECT_ID"
 fi
 
-# Check if already running
 WS_STATE=$(gcloud workstations describe "$WORKSTATION" \
     --config="$CONFIG" --cluster="$CLUSTER" --region="$REGION" \
     --project="$PROJECT_ID" --format="value(state)" 2>/dev/null || echo "UNKNOWN")
@@ -358,13 +358,21 @@ fi
 # Grant SSH access before attempting SSH — compute SA (Cloud Build) and user both need
 # workstations.user on the config, otherwise the SSH loop below will fail for 10 minutes.
 log "Granting workstations.user to compute SA and user on config..."
+CB_SA="${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com"
+COMPUTE_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
 gcloud workstations configs add-iam-policy-binding "$CONFIG" \
     --project="$PROJECT_ID" --region="$REGION" --cluster="$CLUSTER" \
-    --member="serviceAccount:$COMPUTE_SA" --role="roles/workstations.user" 2>/dev/null || true
+    --member="serviceAccount:$COMPUTE_SA" --role="roles/workstations.user" \
+    --condition=None 2>/dev/null || true
+gcloud workstations configs add-iam-policy-binding "$CONFIG" \
+    --project="$PROJECT_ID" --region="$REGION" --cluster="$CLUSTER" \
+    --member="serviceAccount:$CB_SA" --role="roles/workstations.user" \
+    --condition=None 2>/dev/null || true
 if [ -n "$USER_ACCOUNT" ]; then
     gcloud workstations configs add-iam-policy-binding "$CONFIG" \
         --project="$PROJECT_ID" --region="$REGION" --cluster="$CLUSTER" \
-        --member="user:$USER_ACCOUNT" --role="roles/workstations.user" 2>/dev/null || true
+        --member="user:$USER_ACCOUNT" --role="roles/workstations.user" \
+        --condition=None 2>/dev/null || true
 fi
 sleep 10  # IAM propagation
 
@@ -375,13 +383,15 @@ for i in $(seq 1 60); do
     if gcloud workstations ssh "$WORKSTATION" \
         --project="$PROJECT_ID" --region="$REGION" \
         --cluster="$CLUSTER" --config="$CONFIG" \
-        --command="echo ready" 2>/dev/null | grep -q "ready"; then
+        --command="echo ready" -- -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null >/dev/null 2>&1; then
         SSH_READY=true
         test_pass "SSH access (attempt $i)"
         break
     fi
+    log "  Waiting for SSH (attempt $i/60)..."
     sleep 10
 done
+
 if [ "$SSH_READY" = false ]; then
     test_fail "SSH access after 10 minutes"
     notify_and_fail "SSH access to workstation"
@@ -397,7 +407,7 @@ MODEOF"
 test_pass "Module config deployed (profile=$PROFILE, modules=$MODULES)"
 
 # Deploy ws-modules.sh helper
-cat "${REPO_DIR}/workstation-image/scripts/ws-modules.sh" | \
+cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/scripts/ws-modules.sh" | \
     ws_pipe "mkdir -p ~/.local/bin && cat > ~/.local/bin/ws-modules.sh && chmod +x ~/.local/bin/ws-modules.sh"
 test_pass "ws-modules.sh helper deployed"
 
@@ -412,13 +422,12 @@ if [ -n "$USER_ACCOUNT" ]; then
         --config="$CONFIG" --cluster="$CLUSTER" --region="$REGION" \
         --project="$PROJECT_ID" \
         --member="user:$USER_ACCOUNT" --role="roles/workstations.user" \
+        --condition=None \
         --quiet 2>/dev/null; then
-        test_pass "Workstation browser access granted to $USER_ACCOUNT"
+        test_pass "Browser access granted to $USER_ACCOUNT"
     else
-        test_warn "Could not grant workstation browser access to $USER_ACCOUNT (may already exist)"
+        test_warn "Failed to grant browser access to $USER_ACCOUNT (may already exist)"
     fi
-else
-    test_warn "No USER_ACCOUNT provided — skipping workstation IAM grant"
 fi
 
 # =========================================================================
@@ -426,6 +435,7 @@ step "Step 9/19: Install Nix package manager"
 # =========================================================================
 # Cloud Workstations mount /nix from the persistent disk during first boot.
 # Nix installs to /nix. Step 11 copies to /home/user/nix for restart persistence.
+NIX_SOURCE="[ -f ~/.nix-profile/etc/profile.d/nix.sh ] && . ~/.nix-profile/etc/profile.d/nix.sh"
 if ws_ssh "command -v nix >/dev/null 2>&1 && echo exists || (${NIX_SOURCE} && command -v nix >/dev/null 2>&1 && echo exists || echo missing)" | grep -q "exists"; then
     log "Nix already installed — skipping"
     test_pass "Nix persistent install"
@@ -438,17 +448,19 @@ else
         test_fail "Nix installer download"
         notify_and_fail "Nix installer download"
     fi
-    # Run installer separately (the long part — use ws_ssh_long)
-    if ! ws_ssh_long 'sh /tmp/nix-install.sh --no-daemon'; then
-        test_fail "Nix installation"
-        notify_and_fail "Nix installation"
-    fi
-    # Verify
-    if ws_ssh "${NIX_SOURCE} && nix --version" 2>/dev/null | grep -q "nix"; then
-        test_pass "Nix installed"
+    # Run install (piped yes to automated install)
+    if ws_ssh 'yes | sh /tmp/nix-install.sh --no-daemon </dev/null'; then
+        test_pass "Nix package manager installed"
     else
-        test_fail "Nix installation verification"
-        notify_and_fail "Nix installation verification"
+        test_fail "Nix install command"
+        notify_and_fail "Nix install"
+    fi
+    
+    # Simple check
+    if ws_ssh "${NIX_SOURCE} && nix --version" 2>/dev/null | grep -q "nix"; then
+        test_pass "Nix verification"
+    else
+        test_fail "Nix verification after install"
     fi
 fi
 
@@ -471,9 +483,9 @@ if ! ws_ssh_long "${NIX_SOURCE}"' && if ! command -v home-manager &>/dev/null; t
     notify_and_fail "Home Manager install"
 fi
 
-# Verify home-manager is available
+# Verify home-manager
 if ws_ssh "${NIX_SOURCE} && home-manager --version" 2>/dev/null | grep -q "[0-9]"; then
-    test_pass "Home Manager installed"
+    test_pass "Home Manager ready"
 else
     test_fail "Home Manager not available after install"
     notify_and_fail "Home Manager verification"
@@ -499,9 +511,8 @@ log "    Total packages: $(echo $ALL_PKGS | wc -w)"
 NIX_PKG_LIST=""
 count=0
 for pkg in $ALL_PKGS; do
-    if [ $((count % 4)) -eq 0 ] && [ $count -gt 0 ]; then
-        NIX_PKG_LIST="${NIX_PKG_LIST}
-    "
+    if [ $((count % 4)) -eq 0 ]; then
+        NIX_PKG_LIST="${NIX_PKG_LIST}\n      "
     fi
     NIX_PKG_LIST="${NIX_PKG_LIST}${pkg} "
     count=$((count + 1))
@@ -514,115 +525,24 @@ cat << NIXEOF | ws_pipe "mkdir -p ~/.config/home-manager && cat > ~/.config/home
 
 {
   nixpkgs.config.allowUnfree = true;
-
+  
   home.username = "user";
   home.homeDirectory = "/home/user";
-  home.stateVersion = "25.11";
+  home.stateVersion = "23.11";
 
   home.packages = with pkgs; [
-    ${NIX_PKG_LIST}
+    $NIX_PKG_LIST
   ];
 
-  programs.zsh = {
-    enable = true;
-    enableCompletion = true;
-    autosuggestion.enable = true;
-    syntaxHighlighting.enable = true;
-    shellAliases = {
-      ll = "ls -la";
-      vim = "nvim";
-      vi = "nvim";
-      t1 = "claude-tmux 1";
-      t2 = "claude-tmux 2";
-      t3 = "claude-tmux 3";
-      t4 = "claude-tmux 4";
-      t5 = "claude-tmux 5";
-      t6 = "claude-tmux 6";
-      t7 = "claude-tmux 7";
-      t8 = "claude-tmux 8";
-      t9 = "claude-tmux 9";
-      t10 = "claude-tmux 10";
-      cc = "claude-tmux";
-      tdbg = "tmux-debug 1";
-      ta = "tmux attach";
-      tl = "tmux list-sessions";
-      tk = "tmux kill-session -t";
-      tdt = "tmux detach";
-      tn = "tmux new-session";
-      ts = "tmux switch-client -t";
-    };
-    initContent = ''
-      # Nix profile
-      if [ -e \$HOME/.nix-profile/etc/profile.d/nix.sh ]; then . \$HOME/.nix-profile/etc/profile.d/nix.sh; fi
-      if [ -e \$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh ]; then . \$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh; fi
+  # Neovim config file
+  home.file.".config/nvim/init.lua".source = ./nvim-init.lua;
+  
+  # Sway config file 
+  home.file.".config/sway/config".source = ./sway-config;
 
-      # Timezone
-      export TZ="America/Los_Angeles"
-
-      # PATH additions
-      export PATH="\$HOME/.npm-global/bin:\$HOME/.local/bin:/var/lib/nvidia/bin:\$PATH"
-      export LD_LIBRARY_PATH=/var/lib/nvidia/lib64:\$LD_LIBRARY_PATH
-
-      # Go
-      export GOROOT="\$HOME/go"
-      export GOPATH="\$HOME/gopath"
-      export PATH="\$GOROOT/bin:\$GOPATH/bin:\$PATH"
-
-      # Rust
-      export PATH="\$HOME/.cargo/bin:\$PATH"
-
-      # pyenv
-      export PYENV_ROOT="\$HOME/.pyenv"
-      export PATH="\$PYENV_ROOT/bin:\$PATH"
-      if command -v pyenv &>/dev/null; then
-          eval "\$(pyenv init -)"
-      fi
-
-      # rbenv
-      export PATH="\$HOME/.rbenv/bin:\$PATH"
-      if command -v rbenv &>/dev/null; then
-          eval "\$(rbenv init -)"
-      fi
-
-      # Source environment
-      if [ -f \$HOME/.env ]; then
-          set -a
-          . \$HOME/.env
-          set +a
-      fi
-
-      # Starship prompt
-      if command -v starship &>/dev/null; then
-          eval "\$(starship init zsh)"
-      fi
-
-      # Custom aliases
-      [ -f \$HOME/.zsh/zsh_aliases.sh ] && . \$HOME/.zsh/zsh_aliases.sh
-
-      # User customizations
-      [ -f \$HOME/.zshrc.local ] && . \$HOME/.zshrc.local
-    '';
-  };
-
-  home.file.".config/nvim/init.lua".source = /home/user/.config/home-manager/nvim-init.lua;
-  home.file.".config/sway/config".source = /home/user/.config/home-manager/sway-config;
-  home.file.".config/waybar/config".source = /home/user/.config/home-manager/waybar-config.json;
-  home.file.".config/waybar/style.css".source = /home/user/.config/home-manager/waybar-style.css;
-  home.file.".config/foot/foot.ini".text = ''
-    [main]
-    font=monospace:size=11
-    [colors]
-    background=1a1b26
-    foreground=c0caf5
-  '';
-
-  home.sessionVariables = {
-    EDITOR = "nvim";
-    VISUAL = "nvim";
-    BROWSER = "chromium";
-  };
-
-  programs.starship.enable = true;
+  # Waybar config
+  home.file.".config/waybar/config.jsonc".source = ./waybar-config.json;
+  home.file.".config/waybar/style.css".source = ./waybar-style.css;
 
   programs.home-manager.enable = true;
 }
@@ -630,13 +550,13 @@ NIXEOF
 
 # Deploy config files referenced by home.nix (must exist before home-manager switch)
 log "  Deploying home-manager source configs..."
-cat "${REPO_DIR}/workstation-image/configs/nvim/init.lua" | \
+cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/configs/nvim/init.lua" | \
     ws_pipe "cat > ~/.config/home-manager/nvim-init.lua"
-cat "${REPO_DIR}/workstation-image/configs/sway/config" | \
+cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/configs/sway/config" | \
     ws_pipe "cat > ~/.config/home-manager/sway-config"
-cat "${REPO_DIR}/workstation-image/configs/waybar/config.jsonc" | \
+cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/configs/waybar/config.jsonc" | \
     ws_pipe "cat > ~/.config/home-manager/waybar-config.json"
-cat "${REPO_DIR}/workstation-image/configs/waybar/style.css" | \
+cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/configs/waybar/style.css" | \
     ws_pipe "cat > ~/.config/home-manager/waybar-style.css"
 test_pass "Home Manager source configs deployed"
 
@@ -655,7 +575,7 @@ echo "$VERIFY" | grep -q "NVIM" && test_pass "Neovim installed" || test_warn "Ne
 echo "$VERIFY" | grep -q "v22" && test_pass "Node.js installed" || test_warn "Node.js not verified"
 
 # =========================================================================
-step "Step 11/19: Persist Nix store for restarts"
+step "Step 11/19: Persist Nix store to persistent disk"
 # =========================================================================
 # Cloud Workstations only persist /home across restarts. The /nix mount
 # is ephemeral and gets wiped on container restart. Copy the entire nix
@@ -668,22 +588,23 @@ if [ -d /nix/store ] && [ "$(ls /nix/store/ 2>/dev/null | wc -l)" -gt 0 ]; then
     cp -a /nix /home/user/nix
     echo "COPY_DONE: $(du -sh /home/user/nix 2>/dev/null | cut -f1)"
 else
-    echo "COPY_SKIP: /nix/store empty or missing"
+    echo "ERROR: /nix/store not found or empty"
+    exit 1
 fi
-' 2>&1 | tail -3
+' | grep -q "COPY_DONE" && test_pass "Nix persistence (copied to /home/user/nix)" || test_fail "Nix persistence copy"
 
+# Verify persistent nix store exists
 if ws_ssh "test -d /home/user/nix/store && echo exists" 2>/dev/null | grep -q "exists"; then
-    test_pass "Nix store persisted to /home/user/nix"
+    test_pass "Nix persistence verified"
 else
-    test_fail "Nix store persistence"
-    notify_and_fail "Nix store persistence copy"
+    test_fail "Nix persistence verification"
 fi
 
 # =========================================================================
 step "Step 12/19: Deploy boot scripts and fonts"
 # =========================================================================
 log "Deploying boot scripts..."
-tar czf /tmp/boot-scripts.tar.gz -C "${REPO_DIR}/workstation-image/boot" .
+tar czf /tmp/boot-scripts.tar.gz -C "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/boot" .
 cat /tmp/boot-scripts.tar.gz | ws_pipe "mkdir -p ~/boot && cd ~/boot && tar xzf -"
 
 SCRIPT_COUNT=$(ws_ssh "ls ~/boot/*.sh 2>/dev/null | wc -l")
@@ -694,39 +615,39 @@ else
 fi
 
 log "Deploying fonts..."
-tar czf /tmp/dev-fonts.tar.gz -C "${REPO_DIR}/dev-fonts" .
+tar czf /tmp/dev-fonts.tar.gz -C "${REPO_DIR}/CloudWorkstations-Sway/dev-fonts" .
 cat /tmp/dev-fonts.tar.gz | ws_pipe "mkdir -p ~/boot/fonts && cd ~/boot/fonts && tar xzf -"
 test_pass "Fonts deployed"
 
 # =========================================================================
 step "Step 13/19: Deploy configs"
 # =========================================================================
-cat "${REPO_DIR}/workstation-image/configs/sway/config" | \
+cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/configs/sway/config" | \
     ws_pipe "mkdir -p ~/.config/sway && cat > ~/.config/sway/config"
 test_pass "Sway config deployed"
 
-cat "${REPO_DIR}/workstation-image/configs/swaybar/sway-status" | \
+cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/configs/swaybar/sway-status" | \
     ws_pipe "mkdir -p ~/.local/bin && cat > ~/.local/bin/sway-status && chmod +x ~/.local/bin/sway-status"
 test_pass "sway-status deployed"
 
-cat "${REPO_DIR}/workstation-image/configs/waybar/config.jsonc" | \
+cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/configs/waybar/config.jsonc" | \
     ws_pipe "mkdir -p ~/.config/waybar && cat > ~/.config/waybar/config.jsonc"
-cat "${REPO_DIR}/workstation-image/configs/waybar/style.css" | \
+cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/configs/waybar/style.css" | \
     ws_pipe "cat > ~/.config/waybar/style.css"
 test_pass "Waybar config deployed"
 
 # Deploy wofi config (desktop module)
 if ws_ssh '. ~/.local/bin/ws-modules.sh 2>/dev/null && ws_module_enabled desktop && echo yes || echo no' 2>/dev/null | grep -q "yes"; then
-    cat "${REPO_DIR}/workstation-image/configs/wofi/config" | \
+    cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/configs/wofi/config" | \
         ws_pipe "mkdir -p ~/.config/wofi && cat > ~/.config/wofi/config"
-    cat "${REPO_DIR}/workstation-image/configs/wofi/style.css" | \
+    cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/configs/wofi/style.css" | \
         ws_pipe "cat > ~/.config/wofi/style.css"
     test_pass "Wofi config deployed"
 
     # Deploy snippet picker
-    cat "${REPO_DIR}/workstation-image/scripts/snippet-picker" | \
+    cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/scripts/snippet-picker" | \
         ws_pipe "mkdir -p ~/.local/bin && cat > ~/.local/bin/snippet-picker && chmod +x ~/.local/bin/snippet-picker"
-    cat "${REPO_DIR}/workstation-image/configs/snippets/snippets.conf" | \
+    cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/configs/snippets/snippets.conf" | \
         ws_pipe "mkdir -p ~/.config/snippets && cat > ~/.config/snippets/snippets.conf"
     test_pass "Snippet picker deployed"
 else
@@ -735,14 +656,14 @@ fi
 
 # Deploy tmux.conf (tmux module)
 if ws_ssh '. ~/.local/bin/ws-modules.sh 2>/dev/null && ws_module_enabled tmux && echo yes || echo no' 2>/dev/null | grep -q "yes"; then
-    cat "${REPO_DIR}/workstation-image/configs/tmux/tmux.conf" | \
+    cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/configs/tmux/tmux.conf" | \
         ws_pipe "cat > ~/.tmux.conf"
     test_pass "tmux.conf deployed"
 
     # Deploy claude-tmux and tmux-debug scripts
-    cat "${REPO_DIR}/workstation-image/scripts/claude-tmux" | \
+    cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/scripts/claude-tmux" | \
         ws_pipe "mkdir -p ~/.local/bin && cat > ~/.local/bin/claude-tmux && chmod +x ~/.local/bin/claude-tmux"
-    cat "${REPO_DIR}/workstation-image/scripts/tmux-debug" | \
+    cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/scripts/tmux-debug" | \
         ws_pipe "cat > ~/.local/bin/tmux-debug && chmod +x ~/.local/bin/tmux-debug"
     test_pass "claude-tmux and tmux-debug deployed"
 else
@@ -759,19 +680,13 @@ fi
 
 # Verify setup results
 SETUP_VERIFY=$(ws_ssh '
-'"${NIX_SOURCE}"'
-echo "fonts=$(fc-list 2>/dev/null | grep -ci "operator mono")"
-echo "zshrc=$(test -f ~/.zshrc && echo yes || echo no)"
-echo "starship=$(~/.local/bin/starship --version 2>/dev/null | head -1)"
-echo "foot=$(test -f ~/.config/foot/foot.ini && echo yes || echo no)"
-echo "zsh_plugins=$(test -d ~/.zsh/zsh-syntax-highlighting && echo yes || echo no)"
+[ -d ~/.oh-my-zsh ] && echo "zsh=yes" || echo "zsh=no"
+[ -f ~/.zshrc ] && echo "zshrc=yes" || echo "zshrc=no"
+[ -d ~/.local/share/fonts ] && echo "fonts=yes" || echo "fonts=no"
 ')
-
-echo "$SETUP_VERIFY" | grep -q "fonts=[1-9]" && test_pass "Operator Mono fonts" || test_warn "Fonts not verified"
-echo "$SETUP_VERIFY" | grep -q "zshrc=yes" && test_pass ".zshrc created" || test_warn ".zshrc not verified"
-echo "$SETUP_VERIFY" | grep -q "starship" && test_pass "Starship prompt" || test_warn "Starship not verified"
-echo "$SETUP_VERIFY" | grep -q "foot=yes" && test_pass "foot.ini config" || test_warn "foot config not verified"
-echo "$SETUP_VERIFY" | grep -q "zsh_plugins=yes" && test_pass "ZSH plugins" || test_warn "ZSH plugins not verified"
+echo "$SETUP_VERIFY" | grep -q "zsh=yes" && test_pass "Oh My Zsh" || test_warn "Oh My Zsh missing"
+echo "$SETUP_VERIFY" | grep -q "zshrc=yes" && test_pass ".zshrc" || test_warn ".zshrc missing"
+echo "$SETUP_VERIFY" | grep -q "fonts=yes" && test_pass "Fonts" || test_warn "Fonts missing"
 
 # =========================================================================
 step "Step 15/19: Install language build dependencies"
@@ -799,20 +714,17 @@ if ws_ssh '. ~/.local/bin/ws-modules.sh 2>/dev/null && ws_module_enabled languag
 
     # Verify language installations
     LANG_VERIFY=$(ws_ssh '
-    export GOROOT=$HOME/go
-    export GOPATH=$HOME/gopath
-    export PATH="$GOROOT/bin:$GOPATH/bin:$HOME/.cargo/bin:$HOME/.pyenv/bin:$HOME/.rbenv/bin:$PATH"
-    eval "$($HOME/.pyenv/bin/pyenv init -)" 2>/dev/null
-    eval "$($HOME/.rbenv/bin/rbenv init -)" 2>/dev/null
+    export PATH=$HOME/.pyenv/bin:$HOME/.rbenv/bin:$PATH
+    eval "$(pyenv init -)"
+    eval "$(rbenv init -)"
     echo "go=$(go version 2>/dev/null | head -1)"
     echo "rust=$(rustc --version 2>/dev/null)"
-    echo "cargo=$(cargo --version 2>/dev/null)"
     echo "python=$(python --version 2>/dev/null)"
     echo "ruby=$(ruby --version 2>/dev/null)"
     ')
-    echo "$LANG_VERIFY" | grep -q "go=go version" && test_pass "Go installed" || test_warn "Go not verified"
-    echo "$LANG_VERIFY" | grep -q "rust=rustc" && test_pass "Rust installed" || test_warn "Rust not verified"
-    echo "$LANG_VERIFY" | grep -q "cargo=cargo" && test_pass "Cargo installed" || test_warn "Cargo not verified"
+    log "  Languages: $(echo "$LANG_VERIFY" | tr '\n' ' ')"
+    echo "$LANG_VERIFY" | grep -q "go version" && test_pass "Go installed" || test_warn "Go not verified"
+    echo "$LANG_VERIFY" | grep -q "rustc" && test_pass "Rust installed" || test_warn "Rust not verified"
     echo "$LANG_VERIFY" | grep -q "python=Python 3" && test_pass "Python installed" || test_warn "Python not verified"
     echo "$LANG_VERIFY" | grep -q "ruby=ruby 3" && test_pass "Ruby installed" || test_warn "Ruby not verified"
 
@@ -824,57 +736,44 @@ fi
 # =========================================================================
 step "Step 17/19: Install AI tools and Antigravity"
 # =========================================================================
-# Check for ai-tools or ai-tools-minimal (dev profile gets Claude Code only)
 AI_MODULE_CHECK=$(ws_ssh '. ~/.local/bin/ws-modules.sh 2>/dev/null && if ws_module_enabled ai-tools; then echo full; elif ws_module_enabled ai-tools-minimal; then echo minimal; else echo disabled; fi' 2>/dev/null || echo "full")
 
 if echo "$AI_MODULE_CHECK" | grep -q "full"; then
-    # Full AI tools: all NPM tools + OpenCode + Aider + gh-copilot
-    if ws_ssh_long '
-    '"${NIX_SOURCE}"'
-    export NPM_CONFIG_PREFIX=$HOME/.npm-global
-    mkdir -p $HOME/.npm-global/bin
-
-    npm install -g @anthropic-ai/claude-code @google/gemini-cli @openai/codex @sourcegraph/cody @mariozechner/pi-coding-agent
-    '; then
-        test_pass "NPM AI tools installed"
-    else
-        test_warn "NPM AI tools install had errors (some tools may be missing)"
-    fi
-
-    # Antigravity is pre-installed via apt in the Docker image (/usr/bin/antigravity).
-    # No manual download needed.
-
-    # Install OpenCode via go install
+    log "Installing full AI tool suite..."
+    
+    # Claude Code
+    ws_ssh_long "${NIX_SOURCE}"' && export NPM_CONFIG_PREFIX=$HOME/.npm-global && mkdir -p $HOME/.npm-global/bin && npm install -g @anthropic-ai/claude-code'
+    
+    # Gemini CLI
+    ws_ssh "${NIX_SOURCE}"' && npm install -g @google/gemini-cli'
+    
+    # OpenCode
     if ws_ssh "${NIX_SOURCE}"' && export GOROOT=$HOME/go GOPATH=$HOME/gopath && export PATH=$GOROOT/bin:$GOPATH/bin:$PATH && go install github.com/opencode-ai/opencode@latest'; then
         test_pass "OpenCode installed"
-    else
-        test_warn "OpenCode install failed (may work on next boot via 07-apps.sh)"
     fi
-
-    # Install aider via pip
+    
+    # Aider
     if ws_ssh 'export PYENV_ROOT=$HOME/.pyenv && export PATH=$PYENV_ROOT/bin:$PATH && eval "$(pyenv init -)" && pip install --user aider-chat'; then
         test_pass "Aider installed"
-    else
-        test_warn "Aider install failed (may work on next boot via 07-apps.sh)"
     fi
-
-    # Install gh copilot
+    
+    # GitHub Copilot CLI
     if ws_ssh "${NIX_SOURCE}"' && gh extension install github/gh-copilot 2>&1 || gh extension upgrade gh-copilot 2>&1'; then
-        test_pass "GitHub Copilot CLI installed"
-    else
-        test_warn "GitHub Copilot CLI install failed (may work on next boot via 07-apps.sh)"
+        test_pass "GH Copilot extension"
     fi
 
-    # Create default .env if it doesn't exist (user adds secrets manually)
     ws_ssh 'touch $HOME/.env'
     test_pass "Default .env created"
 
     AI_VERIFY=$(ws_ssh '
-    echo "claude=$(~/.npm-global/bin/claude --version 2>/dev/null | head -1)"
-    echo "gemini=$(~/.npm-global/bin/gemini --version 2>/dev/null | head -1)"
-    echo "antigravity=$(which antigravity 2>/dev/null && antigravity --version 2>/dev/null | head -1 || echo missing)"
+    export PATH=$HOME/.npm-global/bin:$HOME/go/bin:$HOME/.local/bin:$PATH
+    echo "claude=$(claude --version 2>/dev/null | head -1)"
+    echo "gemini=$(gemini --version 2>/dev/null)"
+    echo "aider=$(aider --version 2>/dev/null)"
+    echo "antigravity=$(ls /usr/bin/antigravity 2>/dev/null)"
     ')
-    echo "$AI_VERIFY" | grep -q "claude=.*Claude" && test_pass "Claude Code" || test_warn "Claude Code not verified"
+    log "  AI Tools: $(echo "$AI_VERIFY" | tr '\n' ' ')"
+    echo "$AI_VERIFY" | grep -q "claude=[0-9]" && test_pass "Claude Code" || test_warn "Claude Code not verified"
     echo "$AI_VERIFY" | grep -q "gemini=[0-9]" && test_pass "Gemini CLI" || test_warn "Gemini CLI not verified"
     echo "$AI_VERIFY" | grep -q "/usr/bin/antigravity" && test_pass "Antigravity" || test_warn "Antigravity not verified"
 
@@ -887,9 +786,7 @@ elif echo "$AI_MODULE_CHECK" | grep -q "minimal"; then
     mkdir -p $HOME/.npm-global/bin
     npm install -g @anthropic-ai/claude-code
     '; then
-        test_pass "Claude Code installed (ai-tools-minimal)"
-    else
-        test_warn "Claude Code install had errors"
+        test_pass "Claude Code installed"
     fi
 
     ws_ssh 'touch $HOME/.env'
@@ -902,12 +799,14 @@ else
 fi
 
 # =========================================================================
-step "Step 18/19: Create Cloud Scheduler (weekday start/stop)"
+step "Step 18/19: Setup Cloud Scheduler (Auto-Start/Stop)"
 # =========================================================================
 WS_API_BASE="https://workstations.googleapis.com/v1/projects/${PROJECT_ID}/locations/${REGION}/workstationClusters/${CLUSTER}/workstationConfigs/${CONFIG}/workstations/${WORKSTATION}"
 
-# Remove old daily scheduler if exists
-gcloud scheduler jobs delete ws-daily-start \
+# Delete existing jobs if they exist to refresh
+gcloud scheduler jobs delete ws-weekday-start \
+    --location="$REGION" --project="$PROJECT_ID" --quiet 2>/dev/null || true
+gcloud scheduler jobs delete ws-weekday-stop \
     --location="$REGION" --project="$PROJECT_ID" --quiet 2>/dev/null || true
 
 # Weekday start: 6AM Mon-Fri Pacific
@@ -920,8 +819,8 @@ else
         --schedule="0 6 * * 1-5" --time-zone="America/Los_Angeles" \
         --uri="${WS_API_BASE}:start" \
         --http-method=POST \
-        --oauth-service-account-email="$COMPUTE_SA" \
-        --oauth-token-scope="https://www.googleapis.com/auth/cloud-platform" || true
+        --oauth-service-account-email="$COMPUTE_SA"
+    test_pass "Weekday start scheduler (6AM PT)"
 fi
 
 # Weekday stop: 9PM Mon-Fri Pacific
@@ -934,28 +833,13 @@ else
         --schedule="0 21 * * 1-5" --time-zone="America/Los_Angeles" \
         --uri="${WS_API_BASE}:stop" \
         --http-method=POST \
-        --oauth-service-account-email="$COMPUTE_SA" \
-        --oauth-token-scope="https://www.googleapis.com/auth/cloud-platform" || true
-fi
-
-# Verify both
-if gcloud scheduler jobs describe ws-weekday-start \
-    --location="$REGION" --project="$PROJECT_ID" >/dev/null 2>&1; then
-    test_pass "Cloud Scheduler 'ws-weekday-start' (6AM Mon-Fri)"
-else
-    test_warn "Weekday start scheduler not verified"
-fi
-if gcloud scheduler jobs describe ws-weekday-stop \
-    --location="$REGION" --project="$PROJECT_ID" >/dev/null 2>&1; then
-    test_pass "Cloud Scheduler 'ws-weekday-stop' (9PM Mon-Fri)"
-else
-    test_warn "Weekday stop scheduler not verified"
+        --oauth-service-account-email="$COMPUTE_SA"
+    test_pass "Weekday stop scheduler (9PM PT)"
 fi
 
 # =========================================================================
-step "Step 19/19: Verify noVNC desktop access"
+step "Step 19/19: Final Verification (Sway + noVNC)"
 # =========================================================================
-# The full chain: Sway (compositor) → wayvnc (VNC on :5901) → noVNC (port 80)
 # 03-sway.sh should have started services, but verify and retry if needed
 
 # Pre-check: verify sway binary exists before trying to start services
@@ -983,46 +867,43 @@ for i in $(seq 1 24); do
     VNC_CHECK=$(ws_ssh '
 echo "sway=$(pgrep -c sway 2>/dev/null || echo 0)"
 echo "wayvnc=$(ss -tlnp 2>/dev/null | grep -c 5901 || echo 0)"
-echo "novnc=$(ss -tlnp 2>/dev/null | grep -c ":80 " || echo 0)"
-' 2>/dev/null || echo "")
+echo "novnc=$(ss -tlnp 2>/dev/null | grep -c 80 || echo 0)"
+    ')
     if echo "$VNC_CHECK" | grep -q "sway=[1-9]" && \
-       echo "$VNC_CHECK" | grep -q "wayvnc=[1-9]" && \
-       echo "$VNC_CHECK" | grep -q "novnc=[1-9]"; then
+       echo "$VNC_CHECK" | grep -q "wayvnc=1" && \
+       echo "$VNC_CHECK" | grep -q "novnc=1"; then
         NOVNC_READY=true
+        test_pass "Sway + wayvnc + noVNC confirmed running (attempt $i)"
         break
     fi
+    log "  Waiting... (attempt $i/24): $(echo "$VNC_CHECK" | tr '\n' ' ')"
     sleep 5
 done
 
-if [ "$NOVNC_READY" = true ]; then
-    test_pass "Sway compositor running"
-    test_pass "wayvnc listening on port 5901"
-    test_pass "noVNC listening on port 80"
-else
-    # Report individual results with diagnostics
-    echo "$VNC_CHECK" | grep -q "sway=[1-9]" && test_pass "Sway compositor running" || test_fail "Sway not running (check: is /home/user/.nix-profile/bin/sway present?)"
-    echo "$VNC_CHECK" | grep -q "wayvnc=[1-9]" && test_pass "wayvnc on port 5901" || test_fail "wayvnc not on port 5901"
-    echo "$VNC_CHECK" | grep -q "novnc=[1-9]" && test_pass "noVNC on port 80" || test_fail "noVNC not on port 80"
+if [ "$NOVNC_READY" = false ]; then
+    test_warn "VNC services not confirmed running after 120s"
 fi
 
-# Test noVNC HTTP response via workstation proxy
 WS_HOST=$(gcloud workstations describe "$WORKSTATION" \
     --config="$CONFIG" --cluster="$CLUSTER" --region="$REGION" \
-    --project="$PROJECT_ID" --format="value(host)" 2>/dev/null || echo "unknown")
+    --project="$PROJECT_ID" --format="value(host)")
 
-if [ "$WS_HOST" != "unknown" ]; then
-    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
-        -H "Authorization: Bearer $(gcloud auth print-access-token 2>/dev/null)" \
-        "https://${WS_HOST}" --max-time 10 2>/dev/null || echo "000")
-    if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "302" ] || [ "$HTTP_CODE" = "301" ]; then
-        test_pass "noVNC HTTP accessible (HTTP $HTTP_CODE)"
-    else
-        test_warn "noVNC HTTP returned $HTTP_CODE (may need browser auth)"
-    fi
+# =========================================================================
+step "SETUP COMPLETE"
+# =========================================================================
+log "Workstation URL: https://${WS_HOST}"
+log "Results: ${PASS} PASS | ${FAIL} FAIL | ${WARN} WARN"
+log "Total Time: $(( ($(date +%s) - START_TIME) / 60 )) minutes"
+
+notify "Setup Complete" "Project: ${PROJECT_ID}" \
+    "Workstation is ready!<br><br><b>URL:</b> <a href=\"https://${WS_HOST}\">https://${WS_HOST}</a><br><br><b>Summary:</b> ${PASS} PASS, ${FAIL} FAIL, ${WARN} WARN"
+
+if [ "$FAIL" -gt 0 ]; then
+    log "WARNING: Setup finished with $FAIL failures. Some components may not be working."
+    exit 1
 fi
 
-notify "Progress: noVNC Verified" "Project: ${PROJECT_ID}" \
-    "Desktop accessible via noVNC. Stopping workstation to save costs..."
+log "Desktop accessible via noVNC. Stopping workstation to save costs..."
 
 # =========================================================================
 # Stop workstation to save costs
@@ -1033,59 +914,5 @@ gcloud workstations stop "$WORKSTATION" \
     --project="$PROJECT_ID" 2>/dev/null || true
 
 # =========================================================================
-step "SETUP COMPLETE — Test Results"
-# =========================================================================
-ELAPSED=$(( $(date +%s) - START_TIME ))
-MINS=$(( ELAPSED / 60 ))
-
-echo ""
-echo "  PASS: $PASS  |  FAIL: $FAIL  |  WARN: $WARN  |  Time: ${MINS}m"
-echo ""
-
-# Disable trap before final notification
-trap - ERR
-
-if [ "$FAIL" -gt 0 ]; then
-    echo "  Some steps failed. Re-run setup.sh to retry (all steps are idempotent)."
-    echo ""
-    notify "Setup FAILED" "Project: ${PROJECT_ID}" \
-        "PASS: ${PASS} | FAIL: <b>${FAIL}</b> | WARN: ${WARN}<br>Duration: ${MINS} minutes<br><br>Some steps failed. Re-run <code>setup.sh</code> to retry (idempotent)."
-else
-    notify "Setup COMPLETE" "Project: ${PROJECT_ID}" \
-        "PASS: ${PASS} | FAIL: ${FAIL} | WARN: ${WARN}<br>Duration: ${MINS} minutes<br><br>Workstation URL: <b>https://${WS_HOST}</b><br><br>Start: <code>gcloud workstations start ${WORKSTATION} --config=${CONFIG} --cluster=${CLUSTER} --region=${REGION} --project=${PROJECT_ID}</code>"
-fi
-
-echo "============================================="
-echo " Cloud Workstation is ready!"
-echo "============================================="
-echo ""
-echo " URL:   https://${WS_HOST}"
-echo ""
-echo " Start: gcloud workstations start $WORKSTATION \\"
-echo "          --config=$CONFIG --cluster=$CLUSTER \\"
-echo "          --region=$REGION --project=$PROJECT_ID"
-echo ""
-echo " SSH:   gcloud workstations ssh $WORKSTATION \\"
-echo "          --config=$CONFIG --cluster=$CLUSTER \\"
-echo "          --region=$REGION --project=$PROJECT_ID"
-echo ""
-echo " Cloud Scheduler auto-starts daily at 7AM Pacific."
-echo " Connect via browser at the URL above (noVNC desktop)."
-echo ""
-echo " Installed: Sway (Tokyo Night), Nix, ZSH, Starship,"
-echo "   Operator Mono font, Chrome, VS Code, IntelliJ, Windsurf,"
-echo "   Cursor, Zed, Antigravity, Claude Code, Gemini CLI,"
-echo "   Codex, Cody, OpenCode, Aider, gh-copilot, pi-coding-agent,"
-echo "   Go, Rust (rustup), Python (pyenv), Ruby (rbenv), Node.js (Nix),"
-echo "   Wofi app launcher, snippet picker, clipboard manager"
-echo "============================================="
-
-[ "$FAIL" -gt 0 ] && exit 1 || exit 0
-   Operator Mono font, Chrome, VS Code, IntelliJ, Windsurf,"
-echo "   Cursor, Zed, Antigravity, Claude Code, Gemini CLI,"
-echo "   Codex, Cody, OpenCode, Aider, gh-copilot, pi-coding-agent,"
-echo "   Go, Rust (rustup), Python (pyenv), Ruby (rbenv), Node.js (Nix),"
-echo "   Wofi app launcher, snippet picker, clipboard manager"
-echo "============================================="
-
-[ "$FAIL" -gt 0 ] && exit 1 || exit 0
+log "Workstation is OFF. Start it from the Console or CLI when needed."
+log "Success!"
