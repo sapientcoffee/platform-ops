@@ -58,9 +58,6 @@ else
     REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 fi
 
-log()  { echo "[$(date '+%H:%M:%S')] $1"; }
-step() { echo ""; echo "========================================"; echo "  $1"; echo "========================================"; }
-
 # Send Google Chat / Slack webhook notification
 notify_webhook() {
     [ -z "$WEBHOOK_URL" ] && return 0
@@ -1077,6 +1074,14 @@ echo " Connect via browser at the URL above (noVNC desktop)."
 echo ""
 echo " Installed: Sway (Tokyo Night), Nix, ZSH, Starship,"
 echo "   Operator Mono font, Chrome, VS Code, IntelliJ, Windsurf,"
+echo "   Cursor, Zed, Antigravity, Claude Code, Gemini CLI,"
+echo "   Codex, Cody, OpenCode, Aider, gh-copilot, pi-coding-agent,"
+echo "   Go, Rust (rustup), Python (pyenv), Ruby (rbenv), Node.js (Nix),"
+echo "   Wofi app launcher, snippet picker, clipboard manager"
+echo "============================================="
+
+[ "$FAIL" -gt 0 ] && exit 1 || exit 0
+   Operator Mono font, Chrome, VS Code, IntelliJ, Windsurf,"
 echo "   Cursor, Zed, Antigravity, Claude Code, Gemini CLI,"
 echo "   Codex, Cody, OpenCode, Aider, gh-copilot, pi-coding-agent,"
 echo "   Go, Rust (rustup), Python (pyenv), Ruby (rbenv), Node.js (Nix),"

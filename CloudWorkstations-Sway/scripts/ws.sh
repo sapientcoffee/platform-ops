@@ -257,16 +257,19 @@ if [ "$COMMAND" = "setup" ]; then
 
     cat > "${TMPDIR}/cloudbuild.yaml" << 'BUILDEOF'
 steps:
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:latest'
-    entrypoint: 'sh'
+  - name: 'gcr.io/cloud-builders/git'
+    args: ['clone', '${_REPO_URL}', '/workspace/repo']
+    id: 'clone-repo'
+
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
     args:
       - '-c'
       - |
-        git clone ${_REPO_URL} /workspace/repo
         cd /workspace/repo
-        ls -la CloudWorkstations-Sway/scripts/cloud-build-setup.sh
-        sh CloudWorkstations-Sway/scripts/cloud-build-setup.sh "${PROJECT_ID}" "${_REGION}" "${_WEBHOOK_URL}" "${_EMAIL_FUNC_URL}" "${_EMAIL}" "${_USER_ACCOUNT}" "${_PROFILE}"
+        bash CloudWorkstations-Sway/scripts/cloud-build-setup.sh "${PROJECT_ID}" "${_REGION}" "${_WEBHOOK_URL}" "${_EMAIL_FUNC_URL}" "${_EMAIL}" "${_USER_ACCOUNT}" "${_PROFILE}"
     id: 'run-setup'
+    waitFor: ['clone-repo']
 
 timeout: 7200s
 substitutions:
@@ -280,6 +283,7 @@ substitutions:
 options:
   logging: CLOUD_LOGGING_ONLY
   machineType: 'E2_HIGHCPU_8'
+
 BUILDEOF
 
     # Build the substitutions array — use gcloud's --substitutions flag carefully.
