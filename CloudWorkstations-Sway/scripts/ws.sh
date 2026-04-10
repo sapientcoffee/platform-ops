@@ -257,12 +257,11 @@ if [ "$COMMAND" = "setup" ]; then
 
     cat > "${TMPDIR}/cloudbuild.yaml" << 'BUILDEOF'
 steps:
-  - name: 'ubuntu'
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:latest'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        apt-get update && apt-get install -y git curl
         git clone ${_REPO_URL} /workspace/repo
         cd /workspace/repo
         bash CloudWorkstations-Sway/scripts/cloud-build-setup.sh "${PROJECT_ID}" "${_REGION}" "${_WEBHOOK_URL}" "${_EMAIL_FUNC_URL}" "${_EMAIL}" "${_USER_ACCOUNT}" "${_PROFILE}"
