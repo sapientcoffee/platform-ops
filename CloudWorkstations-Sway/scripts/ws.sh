@@ -18,7 +18,7 @@ set -euo pipefail
 REGION="us-central1"
 # Auto-detect repo URL from git remote (falls back to placeholder if not in a git repo)
 SCRIPT_DIR_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_URL=$(git -C "$SCRIPT_DIR_ROOT" remote get-url origin 2>/dev/null || echo "https://github.com/your-github-username/cloud-workstations.git")
+REPO_URL=$(git -C "$SCRIPT_DIR_ROOT" remote get-url origin 2>/dev/null || echo "https://github.com/sapientcoffee/platform-ops.git")
 CLUSTER="workstation-cluster"
 CONFIG="ws-config"
 WORKSTATION="dev-workstation"
@@ -273,7 +273,7 @@ steps:
 
 timeout: 7200s
 substitutions:
-  _REPO_URL: 'https://github.com/your-github-username/cloud-workstations.git'
+  _REPO_URL: 'https://github.com/sapientcoffee/platform-ops.git'
   _REGION: 'us-central1'
   _WEBHOOK_URL: ''
   _EMAIL_FUNC_URL: ''
