@@ -258,16 +258,17 @@ if [ "$COMMAND" = "setup" ]; then
     cat > "${TMPDIR}/cloudbuild.yaml" << 'BUILDEOF'
 steps:
   - name: 'gcr.io/cloud-builders/git'
-    args: ['clone', '${_REPO_URL}', '/workspace/repo']
+    args: ['clone', '${_CB_REPO_URL}', '/workspace/repo']
     id: 'clone-repo'
 
   - name: 'gcr.io/cloud-builders/gcloud'
-    entrypoint: 'sh'
+    entrypoint: 'bash'
     args:
       - '-c'
       - |
         cd /workspace/repo
-        sh CloudWorkstations-Sway/scripts/cloud-build-setup.sh "${PROJECT_ID}" "${_REGION}" "${_WEBHOOK_URL}" "${_EMAIL_FUNC_URL}" "${_EMAIL}" "${_USER_ACCOUNT}" "${_PROFILE}"
+        bash CloudWorkstations-Sway/scripts/cloud-build-setup.sh "${PROJECT_ID}" "${_CB_REGION}" "${_CB_WEBHOOK_URL}" "${_CB_EMAIL_FUNC_URL}" "${_CB_EMAIL}" "${_CB_USER_ACCOUNT}" "${_CB_PROFILE}"
+
     id: 'run-setup'
     waitFor: ['clone-repo']
 
@@ -302,8 +303,7 @@ BUILDEOF
         --project="$PROJECT_ID" \
         --region="$REGION" \
         --no-source \
-        --substitutions="$SUBS_STR" \
-        --async 2>&1)
+        --substitutions="$SUBS_STR")
 
     BUILD_ID=$(echo "$BUILD_OUTPUT" | grep -oP 'builds/\K[a-f0-9-]+' | head -1)
 
