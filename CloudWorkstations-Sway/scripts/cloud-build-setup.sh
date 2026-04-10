@@ -50,10 +50,11 @@ PASS=0; FAIL=0; WARN=0
 START_TIME=$(date +%s)
 
 # Auto-detect repo directory: use /workspace/repo (Cloud Build) or derive from script location
-if [ -d "/workspace/repo/scripts" ]; then
+if [ -d "/workspace/repo/CloudWorkstations-Sway" ]; then
     REPO_DIR="/workspace/repo"
 else
-    REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+    # derive from script location (assumed to be REPO_ROOT/CloudWorkstations-Sway/scripts/...)
+    REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 fi
 
 # Send Google Chat / Slack webhook notification
