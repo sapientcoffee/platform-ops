@@ -11,6 +11,11 @@
 
 set -euo pipefail
 
+log "Diagnostic: gcloud state"
+gcloud config list || true
+gcloud auth list || true
+ls -R /workspace/repo/CloudWorkstations-Sway/scripts || true
+
 PROJECT_ID="${1:?Usage: cloud-build-setup.sh PROJECT_ID REGION [WEBHOOK_URL] [EMAIL_FUNC_URL] [EMAIL] [USER_ACCOUNT] [PROFILE]}"
 REGION="${2:-us-central1}"
 WEBHOOK_URL="${3:-}"
