@@ -258,6 +258,7 @@ if [ "$COMMAND" = "setup" ]; then
     cat > "${TMPDIR}/cloudbuild.yaml" << 'BUILDEOF'
 steps:
   - name: 'ubuntu'
+    entrypoint: 'bash'
     args:
       - '-c'
       - |
