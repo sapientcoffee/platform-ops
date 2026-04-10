@@ -1,0 +1,192 @@
+/*
+ * Waybar CSS — Tokyo Night theme
+ */
+
+/* ── Tokyo Night palette ─────────────────────────────────────────── */
+@define-color bg        #1a1b26;
+@define-color fg        #c0caf5;
+@define-color accent    #7aa2f7;
+@define-color urgent    #f7768e;
+@define-color green     #9ece6a;
+@define-color yellow    #e0af68;
+@define-color magenta   #bb9af7;
+@define-color cyan      #7dcfff;
+@define-color muted     #414868;
+@define-color surface   #24283b;
+
+/* ── Global bar ──────────────────────────────────────────────────── */
+window#waybar {
+    background-color: rgba(26, 27, 38, 0.85);
+    border-bottom: 2px solid @surface;
+    color: @fg;
+    font-family: "JetBrains Mono", "Fira Code", "monospace";
+    font-size: 13px;
+    transition: background-color 0.2s ease;
+}
+
+window#waybar.hidden {
+    opacity: 0.2;
+}
+
+/* ── Tooltips ────────────────────────────────────────────────────── */
+tooltip {
+    background-color: @bg;
+    border: 1px solid @accent;
+    border-radius: 8px;
+    color: @fg;
+    padding: 8px 12px;
+}
+
+tooltip label {
+    color: @fg;
+}
+
+/* ── All modules: pill-shaped containers ─────────────────────────── */
+#custom-apps,
+#workspaces,
+#mode,
+#window,
+#cpu,
+#memory,
+#disk,
+#network,
+#custom-gpu,
+#clock {
+    background-color: @surface;
+    border-radius: 12px;
+    margin: 4px 3px;
+    padding: 0 14px;
+    transition: all 0.2s ease;
+}
+
+#custom-apps:hover,
+#workspaces:hover,
+#cpu:hover,
+#memory:hover,
+#disk:hover,
+#network:hover,
+#custom-gpu:hover,
+#clock:hover {
+    background-color: rgba(65, 72, 104, 0.6);
+}
+
+/* ── Workspaces ──────────────────────────────────────────────────── */
+#workspaces {
+    padding: 0 4px;
+}
+
+#workspaces button {
+    all: unset;
+    color: @muted;
+    border-radius: 8px;
+    margin: 3px 2px;
+    padding: 2px 10px;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+#workspaces button:hover {
+    background-color: rgba(122, 162, 247, 0.2);
+    color: @fg;
+}
+
+#workspaces button.focused {
+    background-color: @accent;
+    color: @bg;
+    box-shadow: 0 0 6px rgba(122, 162, 247, 0.4);
+}
+
+#workspaces button.urgent {
+    background-color: @urgent;
+    color: @bg;
+    animation: urgent-pulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes urgent-pulse {
+    from { background-color: @urgent; }
+    to   { background-color: rgba(247, 118, 142, 0.6); }
+}
+
+/* ── Sway mode (resize, etc.) ────────────────────────────────────── */
+#mode {
+    background-color: @urgent;
+    color: @bg;
+    font-weight: bold;
+}
+
+/* ── Window title ────────────────────────────────────────────────── */
+#window {
+    background-color: transparent;
+    color: @fg;
+    font-weight: 500;
+}
+
+/* ── Clock ───────────────────────────────────────────────────────── */
+#clock {
+    color: @fg;
+    font-weight: bold;
+}
+
+/* ── CPU ─────────────────────────────────────────────────────────── */
+#cpu {
+    color: @green;
+}
+
+#cpu.warning {
+    color: @yellow;
+}
+
+#cpu.critical {
+    color: @urgent;
+    font-weight: bold;
+}
+
+/* ── Memory ──────────────────────────────────────────────────────── */
+#memory {
+    color: @cyan;
+}
+
+#memory.warning {
+    color: @yellow;
+}
+
+#memory.critical {
+    color: @urgent;
+    font-weight: bold;
+}
+
+/* ── Disk ────────────────────────────────────────────────────────── */
+#disk {
+    color: @magenta;
+}
+
+#disk.warning {
+    color: @yellow;
+}
+
+#disk.critical {
+    color: @urgent;
+    font-weight: bold;
+}
+
+/* ── Network ─────────────────────────────────────────────────────── */
+#network {
+    color: @green;
+}
+
+#network.disconnected {
+    color: @urgent;
+}
+
+/* ── GPU (custom module) ─────────────────────────────────────────── */
+#custom-gpu {
+    color: @accent;
+}
+
+/* ── Apps button (custom module) ────────────────────────────────── */
+#custom-apps {
+    background-color: rgba(122, 162, 247, 0.15);
+    color: @accent;
+    font-weight: bold;
+    padding: 0 16px;
+}

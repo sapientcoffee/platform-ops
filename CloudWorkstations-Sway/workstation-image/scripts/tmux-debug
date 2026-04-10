@@ -1,0 +1,15 @@
+#!/bin/bash
+# tmux-debug — Start tmux with server-level logging + launch Claude
+LOG="/home/user/logs/tmux/tmux-server-$(date +%Y%m%d-%H%M%S).log"
+mkdir -p /home/user/logs/tmux
+echo "tmux server log: $LOG"
+SESSION="${1:-1}"
+if tmux has-session -t "$SESSION" 2>/dev/null; then
+    tmux attach-session -t "$SESSION"
+else
+    tmux -v new-session -d -s "$SESSION" -n main 2>"$LOG"
+    tmux set-option -t "$SESSION" detach-on-destroy no-detached
+    tmux set-option -t "$SESSION" exit-empty off
+    tmux send-keys -t "$SESSION:main" "claude --dangerously-skip-permissions" Enter
+    tmux attach-session -t "$SESSION"
+fi

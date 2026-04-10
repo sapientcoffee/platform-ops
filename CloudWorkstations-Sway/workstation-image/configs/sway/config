@@ -1,0 +1,228 @@
+# =============================================================================
+# Sway Window Manager Configuration
+# Cloud Workstation — Tokyo Night Theme
+# =============================================================================
+# Sway 1.11 with wayvnc (WLR_BACKENDS=headless)
+# All keybindings use CTRL+SHIFT modifier (browser/noVNC friendly)
+# 8 workspaces mapped to CTRL+SHIFT+U/I/O/P/H/J/K/L
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Tokyo Night Color Palette
+# -----------------------------------------------------------------------------
+set $bg       #1a1b26
+set $fg       #c0caf5
+set $accent   #7aa2f7
+set $urgent   #f7768e
+set $green    #9ece6a
+set $yellow   #e0af68
+set $magenta  #bb9af7
+set $cyan     #7dcfff
+set $muted    #414868
+set $inactive #565f89
+
+# -----------------------------------------------------------------------------
+# Modifier Key
+# -----------------------------------------------------------------------------
+# We use CTRL+SHIFT as the primary modifier because Super is unreliable
+# through browser-based noVNC connections.
+set $mod Ctrl+Shift
+
+# -----------------------------------------------------------------------------
+# Font
+# -----------------------------------------------------------------------------
+font pango:monospace Bold 10
+
+# -----------------------------------------------------------------------------
+# Gaps and Borders
+# -----------------------------------------------------------------------------
+gaps inner 6
+gaps outer 0
+smart_gaps on
+
+default_border pixel 2
+default_floating_border pixel 2
+
+# Window Colors          border    bg        text       indicator    child_border
+client.focused           $accent   $accent   $bg        $green       $accent
+client.focused_inactive  $muted    $muted    $fg        $muted       $muted
+client.unfocused         $bg       $bg       $inactive  $bg          $bg
+client.urgent            $urgent   $urgent   $bg        $urgent      $urgent
+
+# -----------------------------------------------------------------------------
+# Output / Background
+# -----------------------------------------------------------------------------
+output * bg $bg solid_color
+
+# Headless output for wayvnc
+output HEADLESS-1 resolution 1920x1080
+
+# -----------------------------------------------------------------------------
+# Input / Focus
+# -----------------------------------------------------------------------------
+focus_follows_mouse yes
+
+# Cursor theme
+seat seat0 xcursor_theme default 24
+
+# -----------------------------------------------------------------------------
+# Floating Window Rules
+# -----------------------------------------------------------------------------
+for_window [window_role="pop-up"] floating enable
+for_window [window_role="dialog"] floating enable
+for_window [window_role="task_dialog"] floating enable
+for_window [window_type="dialog"] floating enable
+for_window [window_type="splash"] floating enable
+for_window [title="(?:Open|Save) (?:File|Folder|As)"] floating enable
+for_window [app_id="pavucontrol"] floating enable
+for_window [app_id="thunar" title="File Operation Progress"] floating enable
+
+# =============================================================================
+# KEY BINDINGS
+# =============================================================================
+# All bindings per F-0016 spec. Modifier is CTRL+SHIFT unless noted.
+# =============================================================================
+
+# Nix profile prefix (sway's PATH doesn't include Nix)
+set $nix /home/user/.nix-profile/bin
+
+# -----------------------------------------------------------------------------
+# General — Launch Applications
+# -----------------------------------------------------------------------------
+
+# Terminal (foot)
+bindsym $mod+Return exec $nix/foot
+bindsym $mod+t exec $nix/foot
+
+# Application Launcher (wofi)
+bindsym $mod+r exec env -u LD_LIBRARY_PATH XDG_DATA_DIRS=/home/user/.nix-profile/share:/usr/share:/usr/local/share $nix/wofi --show drun --allow-images
+
+# File Manager (Thunar)
+bindsym $mod+e exec $nix/thunar
+
+# Web Browser (Google Chrome — /dev/shm too small at 64MB in container)
+bindsym $mod+b exec google-chrome-stable --disable-dev-shm-usage
+
+# Antigravity (Electron app — Wayland, no-sandbox, /dev/shm too small at 64MB)
+bindsym $mod+n exec /usr/bin/antigravity --no-sandbox --ozone-platform=wayland --disable-gpu --disable-dev-shm-usage
+
+# IntelliJ IDEA Community (X11/Swing app — needs DISPLAY for Xwayland)
+bindsym $mod+m exec env DISPLAY=:0 $nix/idea-oss
+
+# VS Code (Electron app — clear LD_LIBRARY_PATH so nvidia GL doesn't conflict with Nix)
+bindsym $mod+y exec env -u LD_LIBRARY_PATH $nix/code --no-sandbox --ozone-platform=wayland --disable-gpu --disable-dev-shm-usage
+
+# Windsurf (Electron app — same flags as VSCode)
+bindsym $mod+w exec env -u LD_LIBRARY_PATH $nix/windsurf --no-sandbox --ozone-platform=wayland --disable-gpu --disable-dev-shm-usage
+
+# Clipboard history picker (clipman — needs wofi in PATH and clear LD_LIBRARY_PATH)
+bindsym $mod+a exec env -u LD_LIBRARY_PATH PATH=/home/user/.nix-profile/bin:$PATH $nix/clipman pick --tool wofi
+
+# Snippet picker (text expansion)
+bindsym $mod+s exec /home/user/.local/bin/snippet-picker
+
+# -----------------------------------------------------------------------------
+# General — Window Management
+# -----------------------------------------------------------------------------
+
+# Close active window
+bindsym $mod+q kill
+
+# Toggle fullscreen
+bindsym $mod+f fullscreen toggle
+bindsym Mod4+f fullscreen toggle
+
+# Toggle floating window
+bindsym $mod+d floating toggle
+
+# Exit Sway
+bindsym $mod+Escape exec $nix/swaynag -t warning -m 'Exit Sway?' -B 'Yes, exit' '$nix/swaymsg exit'
+
+# -----------------------------------------------------------------------------
+# Navigation — Focus
+# -----------------------------------------------------------------------------
+bindsym $mod+Left focus left
+bindsym $mod+Right focus right
+bindsym $mod+Up focus up
+bindsym $mod+Down focus down
+
+# -----------------------------------------------------------------------------
+# Window Resize
+# -----------------------------------------------------------------------------
+# Comma = grow width, Period = shrink width
+# Minus = shrink height, Equal = grow height
+bindsym $mod+comma resize grow width 20px
+bindsym $mod+period resize shrink width 20px
+bindsym $mod+minus resize shrink height 20px
+bindsym $mod+equal resize grow height 20px
+
+# -----------------------------------------------------------------------------
+# Mouse Bindings
+# -----------------------------------------------------------------------------
+# Hold Mod4 (Super) + mouse to move/resize floating windows
+# Note: floating_modifier only accepts a single modifier key
+floating_modifier Mod4 normal
+
+# -----------------------------------------------------------------------------
+# Workspaces — Switch (CTRL+SHIFT + key)
+# -----------------------------------------------------------------------------
+bindsym $mod+u workspace number 1
+bindsym $mod+i workspace number 2
+bindsym $mod+o workspace number 3
+bindsym $mod+p workspace number 4
+bindsym $mod+h workspace number 5
+bindsym $mod+j workspace number 6
+bindsym $mod+k workspace number 7
+bindsym $mod+l workspace number 8
+
+# -----------------------------------------------------------------------------
+# Workspaces — Move Window (CTRL+SHIFT+ALT + key)
+# -----------------------------------------------------------------------------
+bindsym $mod+Alt+u move container to workspace number 1
+bindsym $mod+Alt+i move container to workspace number 2
+bindsym $mod+Alt+o move container to workspace number 3
+bindsym $mod+Alt+p move container to workspace number 4
+bindsym $mod+Alt+h move container to workspace number 5
+bindsym $mod+Alt+j move container to workspace number 6
+bindsym $mod+Alt+k move container to workspace number 7
+bindsym $mod+Alt+l move container to workspace number 8
+
+# =============================================================================
+# SWAYBAR (integrated status bar — waybar doesn't render through wayvnc)
+# =============================================================================
+bar {
+    swaybar_command /home/user/.nix-profile/bin/swaybar
+    position top
+    height 28
+    font pango:monospace Bold 10
+    status_command /home/user/.local/bin/sway-status
+
+    # Click on status area opens app launcher (◆ Apps button)
+    bindsym button1 exec env -u LD_LIBRARY_PATH XDG_DATA_DIRS=/home/user/.nix-profile/share:/usr/share:/usr/local/share /home/user/.nix-profile/bin/wofi --show drun --allow-images
+
+    colors {
+        background #1a1b26
+        statusline #c0caf5
+        separator  #414868
+
+        #                  border   bg       text
+        focused_workspace  #7aa2f7  #7aa2f7  #1a1b26
+        active_workspace   #414868  #414868  #c0caf5
+        inactive_workspace #1a1b26  #1a1b26  #565f89
+        urgent_workspace   #f7768e  #f7768e  #1a1b26
+    }
+}
+
+# =============================================================================
+# AUTOSTART
+# =============================================================================
+
+# Disable built-in Xwayland (Nix Xwayland fails: nvidia LD_LIBRARY_PATH breaks
+# transitive libX11 resolution in Nix linker). Use system Xwayland instead.
+xwayland disable
+exec /usr/bin/Xwayland :0 &
+
+# Clipboard manager — watch clipboard and store history
+# Use full path since sway's shell doesn't have Nix profile in PATH
+# Clear LD_LIBRARY_PATH to prevent nvidia GL conflicts with Nix binaries
+exec env -u LD_LIBRARY_PATH /home/user/.nix-profile/bin/wl-paste -t text --watch /home/user/.nix-profile/bin/clipman store

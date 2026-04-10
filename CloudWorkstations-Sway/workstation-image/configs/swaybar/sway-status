@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+COLOR_FG="#c0caf5"; COLOR_GREEN="#9ece6a"; COLOR_YELLOW="#e0af68"
+COLOR_RED="#f7768e"; COLOR_BLUE="#7aa2f7"; COLOR_CYAN="#7dcfff"
+export TZ="America/Los_Angeles"
+threshold_color() {
+    local val=$1 warn=$2 crit=$3
+    if (( val >= crit )); then echo "$COLOR_RED"
+    elif (( val >= warn )); then echo "$COLOR_YELLOW"
+    else echo "$COLOR_GREEN"; fi
+}
+json_block() {
+    printf '{"name":"%s","full_text":"%s","color":"%s","separator":true,"separator_block_width":%d}' "$1" "$2" "$3" "${4:-20}"
+}
+collect_apps() {
+    printf '{"name":"apps","full_text":"◆ Apps","color":"%s","background":"#24283b","separator":true,"separator_block_width":20}' "$COLOR_BLUE"
+}
+collect_clock() { json_block "clock" "$(date +"%a %b %d  %H:%M")" "$COLOR_FG"; }
+collect_disk() {
+    local pct=$(df /home 2>/dev/null | awk 'NR==2 {gsub(/%/,"",$5); print $5}')
+    json_block "disk" "DISK ${pct:-0}%" "$(threshold_color "${pct:-0}" 70 85)"
+}
+collect_memory() {
+    local used_kb total_kb
+    read -r total_kb used_kb < <(awk '/^MemTotal:/ {t=$2} /^MemAvailable:/ {a=$2} END {printf "%d %d", t, t-a}' /proc/meminfo)
+    local used_g=$(awk "BEGIN {printf \"%.1f\", ${used_kb}/1048576}")
+    local total_g=$(awk "BEGIN {printf \"%.0f\", ${total_kb}/1048576}")
+    local pct=$(awk "BEGIN {printf \"%.0f\", ${used_kb}*100/${total_kb}}")
+    json_block "memory" "MEM ${used_g}G/${total_g}G" "$(threshold_color "$pct" 60 80)"
+}
+collect_cpu() {
+    local c1=$(awk '/^cpu / {print $2+$3+$4+$5+$6+$7+$8, $5}' /proc/stat)
+    sleep 0.5
+    local c2=$(awk '/^cpu / {print $2+$3+$4+$5+$6+$7+$8, $5}' /proc/stat)
+    local total1 idle1 total2 idle2
+    read -r total1 idle1 <<< "$c1"; read -r total2 idle2 <<< "$c2"
+    local dt=$((total2 - total1)) di=$((idle2 - idle1))
+    local pct=0; (( dt > 0 )) && pct=$(( (dt - di) * 100 / dt ))
+    json_block "cpu" "CPU ${pct}%" "$(threshold_color "$pct" 50 80)"
+}
+collect_gpu() {
+    local gpu_info=$(/var/lib/nvidia/bin/nvidia-smi --query-gpu=name,temperature.gpu,utilization.gpu --format=csv,noheader,nounits 2>/dev/null)
+    if [[ -n "$gpu_info" ]]; then
+        local gpu_name=$(/var/lib/nvidia/bin/nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null | sed 's/.*\(T4\|A100\|V100\|L4\|A10G\|P100\)/\1/' | head -1)
+        local temp=$(echo "$gpu_info" | awk -F', ' '{print $2}' | tr -d ' ')
+        local util=$(echo "$gpu_info" | awk -F', ' '{print $3}' | tr -d ' ')
+        json_block "gpu" "GPU ${gpu_name:-GPU} ${temp}C ${util}%" "$(threshold_color "${util}" 50 80)"
+    else json_block "gpu" "GPU N/A" "$COLOR_BLUE"; fi
+}
+collect_network() {
+    if ping -c1 -W1 8.8.8.8 &>/dev/null; then json_block "network" "NET UP" "$COLOR_GREEN"
+    else json_block "network" "NET DOWN" "$COLOR_RED"; fi
+}
+echo '{"version":1}'
+echo '['
+echo '[],'
+while true; do
+    apps=$(collect_apps)
+    net=$(collect_network)
+    gpu=$(collect_gpu)
+    cpu=$(collect_cpu)
+    mem=$(collect_memory)
+    disk=$(collect_disk)
+    clock=$(collect_clock)
+    echo "[${apps},${net},${gpu},${cpu},${mem},${disk},${clock}],"
+    sleep 2
+done

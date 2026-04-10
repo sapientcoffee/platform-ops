@@ -1,0 +1,9 @@
+show=drun
+allow_images=true
+insensitive=true
+prompt=Apps
+width=500
+height=400
+lines=12
+columns=1
+sort_order=alphabetical

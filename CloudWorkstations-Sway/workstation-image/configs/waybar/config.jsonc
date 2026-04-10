@@ -1,0 +1,111 @@
+// Waybar configuration — Tokyo Night theme
+{
+    "layer": "top",
+    "position": "top",
+    "height": 34,
+    "spacing": 8,
+    "margin-top": 4,
+    "margin-left": 8,
+    "margin-right": 8,
+
+    "modules-left": [
+        "custom/apps",
+        "sway/workspaces",
+        "sway/mode"
+    ],
+    "modules-center": [
+        "sway/window"
+    ],
+    "modules-right": [
+        "network",
+        "custom/gpu",
+        "cpu",
+        "memory",
+        "disk",
+        "clock"
+    ],
+
+    "custom/apps": {
+        "format": " Apps",
+        "on-click": "env -u LD_LIBRARY_PATH XDG_DATA_DIRS=/home/user/.nix-profile/share:/usr/share:/usr/local/share /home/user/.nix-profile/bin/wofi --show drun --allow-images",
+        "tooltip": false
+    },
+
+    "sway/workspaces": {
+        "disable-scroll": true,
+        "all-outputs": true,
+        "format": "{name}"
+    },
+
+    "sway/mode": {
+        "format": " {}",
+        "tooltip": false
+    },
+
+    "sway/window": {
+        "format": "{}",
+        "max-length": 60,
+        "tooltip": false
+    },
+
+    "cpu": {
+        "format": " {usage}%",
+        "interval": 2,
+        "tooltip": true,
+        "states": {
+            "warning": 50,
+            "critical": 80
+        }
+    },
+
+    "memory": {
+        "format": " {used:0.1f}G/{total:0.1f}G",
+        "interval": 2,
+        "tooltip": true,
+        "tooltip-format": "{used:0.1f}G used / {total:0.1f}G total ({percentage}%)",
+        "states": {
+            "warning": 60,
+            "critical": 80
+        }
+    },
+
+    "disk": {
+        "format": " {percentage_used}%",
+        "path": "/home",
+        "interval": 30,
+        "tooltip-format": "{used} used / {total} total ({percentage_used}%)",
+        "states": {
+            "warning": 70,
+            "critical": 85
+        }
+    },
+
+    "network": {
+        "format-ethernet": " {ifname}",
+        "format-disconnected": " down",
+        "interval": 5,
+        "tooltip-format": "{ipaddr}/{cidr} via {gwaddr}"
+    },
+
+    "custom/gpu": {
+        "exec": "/var/lib/nvidia/bin/nvidia-smi --query-gpu=temperature.gpu,utilization.gpu --format=csv,noheader,nounits 2>/dev/null | awk -F', ' '{printf \" %s°C %s%%\", $1, $2}' || echo ' N/A'",
+        "interval": 5,
+        "format": "{}",
+        "tooltip": false
+    },
+
+    "clock": {
+        "format": " {:%a %b %d  %H:%M}",
+        "tooltip-format": "<tt>{calendar}</tt>\n\n<b>{:%Y-%m-%d %H:%M:%S}</b>",
+        "calendar": {
+            "mode": "month",
+            "weeks-pos": "left",
+            "on-scroll": 1,
+            "format": {
+                "months": "<span color='#c0caf5'><b>{}</b></span>",
+                "weekdays": "<span color='#7aa2f7'><b>{}</b></span>",
+                "today": "<span color='#f7768e'><b><u>{}</u></b></span>"
+            }
+        }
+    }
+}

@@ -1,0 +1,41 @@
+#!/bin/bash
+# =============================================================================
+# snippet-picker — Wofi-based snippet picker for Cloud Workstation
+# =============================================================================
+# Reads snippets from ~/.config/snippets/snippets.conf, presents labels
+# in Wofi, and copies the selected snippet value to the clipboard.
+# Format: label|value (pipe-separated, one per line)
+# Lines starting with # are comments, blank lines are skipped.
+# =============================================================================
+
+SNIPPETS_FILE="$HOME/.config/snippets/snippets.conf"
+NIX="$HOME/.nix-profile/bin"
+WOFI="$NIX/wofi"
+WL_COPY="$NIX/wl-copy"
+
+if [ ! -f "$SNIPPETS_FILE" ]; then
+    env -u LD_LIBRARY_PATH "$WOFI" --show dmenu --prompt "Snippets" <<< "No snippets.conf found"
+    exit 1
+fi
+
+# Read labels from config (skip comments and blank lines)
+LABELS=$(grep -v '^\s*#' "$SNIPPETS_FILE" | grep -v '^\s*$' | cut -d'|' -f1)
+
+if [ -z "$LABELS" ]; then
+    env -u LD_LIBRARY_PATH "$WOFI" --show dmenu --prompt "Snippets" <<< "No snippets defined"
+    exit 1
+fi
+
+# Show labels in Wofi and get selection
+SELECTED=$(echo "$LABELS" | env -u LD_LIBRARY_PATH "$WOFI" --show dmenu --prompt "Snippets" --insensitive)
+
+if [ -z "$SELECTED" ]; then
+    exit 0
+fi
+
+# Find the matching snippet value
+VALUE=$(grep -v '^\s*#' "$SNIPPETS_FILE" | grep -v '^\s*$' | grep "^${SELECTED}|" | head -1 | cut -d'|' -f2-)
+
+if [ -n "$VALUE" ]; then
+    echo -n "$VALUE" | env -u LD_LIBRARY_PATH "$WL_COPY"
+fi

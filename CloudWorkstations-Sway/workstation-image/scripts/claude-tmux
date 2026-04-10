@@ -1,0 +1,17 @@
+#!/bin/bash
+# claude-tmux — Run Claude Code in a dedicated tmux window
+# Agent teammates get their own windows, keeping your main window stable
+
+SESSION="${1:-claude}"
+
+# Create or attach to session
+if tmux has-session -t "$SESSION" 2>/dev/null; then
+    tmux attach-session -t "$SESSION"
+else
+    tmux new-session -d -s "$SESSION" -n main
+    # Set session-specific options for stability
+    tmux set-option -t "$SESSION" detach-on-destroy no-detached
+    tmux set-option -t "$SESSION" exit-empty off
+    tmux send-keys -t "$SESSION:main" "claude --dangerously-skip-permissions" Enter
+    tmux attach-session -t "$SESSION"
+fi

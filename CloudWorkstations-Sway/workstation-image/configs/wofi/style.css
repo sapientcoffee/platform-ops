@@ -1,0 +1,74 @@
+/* =============================================================================
+ * Wofi Stylesheet — Tokyo Night Theme
+ * Cloud Workstation
+ * ============================================================================= */
+
+/* Main window */
+window {
+    margin: 0;
+    border: 2px solid #7aa2f7;
+    border-radius: 8px;
+    background-color: #1a1b26;
+    font-family: monospace;
+    font-size: 14px;
+}
+
+/* Input / search bar */
+#input {
+    margin: 8px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    background-color: #24283b;
+    color: #c0caf5;
+    font-size: 14px;
+}
+
+#input:focus {
+    border: none;
+    outline: none;
+}
+
+/* Outer scrollable area */
+#outer-box {
+    margin: 0 8px 8px 8px;
+}
+
+/* Scrollbar */
+#scroll {
+    margin: 0;
+}
+
+scrollbar {
+    border: none;
+    background: transparent;
+}
+
+scrollbar slider {
+    background-color: #414868;
+    border-radius: 4px;
+    min-width: 4px;
+    min-height: 20px;
+}
+
+/* Entry rows */
+#entry {
+    padding: 6px 12px;
+    border-radius: 6px;
+    color: #c0caf5;
+}
+
+#entry:selected {
+    background-color: #7aa2f7;
+    color: #1a1b26;
+}
+
+/* Application text */
+#text {
+    color: inherit;
+}
+
+/* App icons */
+#img {
+    margin-right: 8px;
+}
