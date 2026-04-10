@@ -289,7 +289,7 @@ BUILDEOF
     # Build the substitutions array — use gcloud's --substitutions flag carefully.
     # Webhook URLs contain & and = which are safe in Cloud Build substitution values
     # but must be properly quoted when passed via shell.
-    local SUBS_ARGS=("_CB_REPO_URL=${REPO_URL}" "_CB_REGION=${REGION}" "_CB_USER_ACCOUNT=${ACCOUNT}" "_CB_PROFILE=${PROFILE}")
+    SUBS_ARGS=("_CB_REPO_URL=${REPO_URL}" "_CB_REGION=${REGION}" "_CB_USER_ACCOUNT=${ACCOUNT}" "_CB_PROFILE=${PROFILE}")
     [ -n "$WEBHOOK_URL" ] && SUBS_ARGS+=("_CB_WEBHOOK_URL=${WEBHOOK_URL}")
     [ -n "$EMAIL_FUNCTION_URL" ] && SUBS_ARGS+=("_CB_EMAIL_FUNC_URL=${EMAIL_FUNCTION_URL}" "_CB_EMAIL=${EMAIL}")
 
