@@ -215,7 +215,7 @@ for i in $(seq 1 6); do
 done
 
 log "Building Docker image (this takes 10-15 minutes)..."
-cd "${REPO_DIR}/CloudWorkstations-Sway/workstation-image"
+cd "${REPO_DIR}/workstation-image"
 if retry 2 30 gcloud builds submit \
     --tag="$IMAGE" \
     --project="$PROJECT_ID" \

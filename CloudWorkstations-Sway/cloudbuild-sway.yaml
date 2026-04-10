@@ -4,7 +4,7 @@ steps:
   args: [
     "--destination=us-central1-docker.pkg.dev/coffee-plantation/workstation/sway-novnc:latest",
     "--destination=us-central1-docker.pkg.dev/coffee-plantation/workstation/sway-novnc:$COMMIT_SHA",
-    "--dockerfile=./CloudWorkstations-Sway/workstation-image/Dockerfile",
+    "--dockerfile=Dockerfile",
     "--context=dir:///workspace/CloudWorkstations-Sway/workstation-image",
     "--cache=true",
     "--cache-ttl=24h"]
