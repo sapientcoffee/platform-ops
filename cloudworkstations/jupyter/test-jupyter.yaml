@@ -1,0 +1,9 @@
+steps:
+  - name: 'us-central1-docker.pkg.dev/coffee-and-codey/jupyter-workstation/jupyter-image:latest'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        jupyter lab --ip=0.0.0.0 --port=80 --no-browser --allow-root --ServerApp.token= --ServerApp.password= --ServerApp.allow_origin=* &
+        sleep 5
+        curl -v http://localhost:80

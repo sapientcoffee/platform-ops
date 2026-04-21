@@ -94,7 +94,7 @@ Our pipeline lives in the GCP project `coffee-plantation`.
 
 ### 🛠️ Build Process (`cloudbuild-workstations.yaml`)
 Using **Kaniko** for a clean, daemon-less build:
-1.  **Context**: Builds relative to the `CloudWorkstations/` directory.
+1.  **Context**: Builds relative to the `cloudworkstations/base/` directory.
 2.  **Caching**: Layer caching enabled (24h) for lightning-fast updates.
 3.  **Storage**: Pushed to `europe-docker.pkg.dev/coffee-plantation/workstation/codeoss:latest`.
 

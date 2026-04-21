@@ -9,7 +9,7 @@ We keep these here for historical reference only. They are like that vintage esp
 *   **GitPod**: A classic third-party roast that we've now traded for native GCP solutions.
 
 ### 🚀 Looking for the Fresh Roast?
-If you want the latest and greatest Cloud Developer Environments, head back to the main **[CloudWorkstations/](../CloudWorkstations/)** directory.
+If you want the latest and greatest Cloud Developer Environments, head back to the main **[cloudworkstations/base/](../cloudworkstations/base/)** directory.
 
 ---
 *Stay caffeinated and keep looking forward!* ☕✨

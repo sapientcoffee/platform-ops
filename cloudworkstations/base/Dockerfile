@@ -44,14 +44,14 @@ RUN set -eux; \
 RUN mkdir -p /sapientcoffee/settings /sapientcoffee/scripts 
 
 ## Copy profile settings to the install script locations
-COPY CloudWorkstations/settings.json /sapientcoffee/settings/
+COPY cloudworkstations/base/settings.json /sapientcoffee/settings/
 
 ## Copy Customisation Scripts
-COPY CloudWorkstations/200_custom.sh /etc/workstation-startup.d/200_custom.sh
-COPY CloudWorkstations/200_custom.sh /sapientcoffee/scripts/200_custom.sh
+COPY cloudworkstations/base/200_custom.sh /etc/workstation-startup.d/200_custom.sh
+COPY cloudworkstations/base/200_custom.sh /sapientcoffee/scripts/200_custom.sh
 
 ## Copy profile setup script
-COPY CloudWorkstations/setup.sh /sapientcoffee/scripts/setup.sh
+COPY cloudworkstations/base/setup.sh /sapientcoffee/scripts/setup.sh
 
 ## Make executable and also do a time stamp to confirm the time it was created for rudimentary versioning 
 RUN chmod +x /etc/workstation-startup.d/200_custom.sh /sapientcoffee/scripts/200_custom.sh /sapientcoffee/scripts/setup.sh && \

@@ -47,8 +47,11 @@ The following diagram illustrates how we transition from legacy setups to modern
 
 ## 📂 What's in the Bag?
 
-### 🏗️ [Google Cloud Workstations](./CloudWorkstations/)
+### 🏗️ [Google Cloud Workstations](./cloudworkstations/base/)
 The main course. Dive here for Dockerfiles, startup scripts, and Terraform automation to stand up your own workstation clusters. Now featuring **YADM** for seamless dotfile management!
+
+### 🛰️ [Antigravity GCE Desktop](./gce/antigravity-remote-desktop/)
+A high-performance dedicated VM environment for GUI-intensive IDEs like Antigravity, optimized for low-latency access via Chrome Remote Desktop.
 
 ### 🧪 [Other Experiments](./cloud_build_codey/)
 *   **Cloud Build Codey**: An early experiment in AI-driven builds. Note that this has moved to a more advanced roast over at [GitLab](https://gitlab.com/robedwards/coffee-and-codey.git).

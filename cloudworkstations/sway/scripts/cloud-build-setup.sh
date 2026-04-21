@@ -50,10 +50,10 @@ PASS=0; FAIL=0; WARN=0
 START_TIME=$(date +%s)
 
 # Auto-detect repo directory: use /workspace/repo (Cloud Build) or derive from script location
-if [ -d "/workspace/repo/CloudWorkstations-Sway" ]; then
+if [ -d "/workspace/repo/cloudworkstations/sway" ]; then
     REPO_DIR="/workspace/repo"
 else
-    # derive from script location (assumed to be REPO_ROOT/CloudWorkstations-Sway/scripts/...)
+    # derive from script location (assumed to be REPO_ROOT/cloudworkstations/sway/scripts/...)
     REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 fi
 
@@ -217,7 +217,7 @@ for i in $(seq 1 6); do
 done
 
 log "Building Docker image (this takes 10-15 minutes)..."
-cd "${REPO_DIR}/CloudWorkstations-Sway/workstation-image"
+cd "${REPO_DIR}/cloudworkstations/sway/workstation-image"
 if retry 2 30 gcloud builds submit \
     --tag="$IMAGE" \
     --project="$PROJECT_ID" \
@@ -408,7 +408,7 @@ MODEOF"
 test_pass "Module config deployed (profile=$PROFILE, modules=$MODULES)"
 
 # Deploy ws-modules.sh helper
-cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/scripts/ws-modules.sh" | \
+cat "${REPO_DIR}/cloudworkstations/sway/workstation-image/scripts/ws-modules.sh" | \
     ws_pipe "mkdir -p ~/.local/bin && cat > ~/.local/bin/ws-modules.sh && chmod +x ~/.local/bin/ws-modules.sh"
 test_pass "ws-modules.sh helper deployed"
 
@@ -551,13 +551,13 @@ NIXEOF
 
 # Deploy config files referenced by home.nix (must exist before home-manager switch)
 log "  Deploying home-manager source configs..."
-cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/configs/nvim/init.lua" | \
+cat "${REPO_DIR}/cloudworkstations/sway/workstation-image/configs/nvim/init.lua" | \
     ws_pipe "cat > ~/.config/home-manager/nvim-init.lua"
-cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/configs/sway/config" | \
+cat "${REPO_DIR}/cloudworkstations/sway/workstation-image/configs/sway/config" | \
     ws_pipe "cat > ~/.config/home-manager/sway-config"
-cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/configs/waybar/config.jsonc" | \
+cat "${REPO_DIR}/cloudworkstations/sway/workstation-image/configs/waybar/config.jsonc" | \
     ws_pipe "cat > ~/.config/home-manager/waybar-config.json"
-cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/configs/waybar/style.css" | \
+cat "${REPO_DIR}/cloudworkstations/sway/workstation-image/configs/waybar/style.css" | \
     ws_pipe "cat > ~/.config/home-manager/waybar-style.css"
 test_pass "Home Manager source configs deployed"
 
@@ -605,7 +605,7 @@ fi
 step "Step 12/19: Deploy boot scripts and fonts"
 # =========================================================================
 log "Deploying boot scripts..."
-tar czf /tmp/boot-scripts.tar.gz -C "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/boot" .
+tar czf /tmp/boot-scripts.tar.gz -C "${REPO_DIR}/cloudworkstations/sway/workstation-image/boot" .
 cat /tmp/boot-scripts.tar.gz | ws_pipe "mkdir -p ~/boot && cd ~/boot && tar xzf -"
 
 SCRIPT_COUNT=$(ws_ssh "ls ~/boot/*.sh 2>/dev/null | wc -l")
@@ -616,39 +616,39 @@ else
 fi
 
 log "Deploying fonts..."
-tar czf /tmp/dev-fonts.tar.gz -C "${REPO_DIR}/CloudWorkstations-Sway/dev-fonts" .
+tar czf /tmp/dev-fonts.tar.gz -C "${REPO_DIR}/cloudworkstations/sway/dev-fonts" .
 cat /tmp/dev-fonts.tar.gz | ws_pipe "mkdir -p ~/boot/fonts && cd ~/boot/fonts && tar xzf -"
 test_pass "Fonts deployed"
 
 # =========================================================================
 step "Step 13/19: Deploy configs"
 # =========================================================================
-cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/configs/sway/config" | \
+cat "${REPO_DIR}/cloudworkstations/sway/workstation-image/configs/sway/config" | \
     ws_pipe "mkdir -p ~/.config/sway && cat > ~/.config/sway/config"
 test_pass "Sway config deployed"
 
-cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/configs/swaybar/sway-status" | \
+cat "${REPO_DIR}/cloudworkstations/sway/workstation-image/configs/swaybar/sway-status" | \
     ws_pipe "mkdir -p ~/.local/bin && cat > ~/.local/bin/sway-status && chmod +x ~/.local/bin/sway-status"
 test_pass "sway-status deployed"
 
-cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/configs/waybar/config.jsonc" | \
+cat "${REPO_DIR}/cloudworkstations/sway/workstation-image/configs/waybar/config.jsonc" | \
     ws_pipe "mkdir -p ~/.config/waybar && cat > ~/.config/waybar/config.jsonc"
-cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/configs/waybar/style.css" | \
+cat "${REPO_DIR}/cloudworkstations/sway/workstation-image/configs/waybar/style.css" | \
     ws_pipe "cat > ~/.config/waybar/style.css"
 test_pass "Waybar config deployed"
 
 # Deploy wofi config (desktop module)
 if ws_ssh '. ~/.local/bin/ws-modules.sh 2>/dev/null && ws_module_enabled desktop && echo yes || echo no' 2>/dev/null | grep -q "yes"; then
-    cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/configs/wofi/config" | \
+    cat "${REPO_DIR}/cloudworkstations/sway/workstation-image/configs/wofi/config" | \
         ws_pipe "mkdir -p ~/.config/wofi && cat > ~/.config/wofi/config"
-    cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/configs/wofi/style.css" | \
+    cat "${REPO_DIR}/cloudworkstations/sway/workstation-image/configs/wofi/style.css" | \
         ws_pipe "cat > ~/.config/wofi/style.css"
     test_pass "Wofi config deployed"
 
     # Deploy snippet picker
-    cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/scripts/snippet-picker" | \
+    cat "${REPO_DIR}/cloudworkstations/sway/workstation-image/scripts/snippet-picker" | \
         ws_pipe "mkdir -p ~/.local/bin && cat > ~/.local/bin/snippet-picker && chmod +x ~/.local/bin/snippet-picker"
-    cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/configs/snippets/snippets.conf" | \
+    cat "${REPO_DIR}/cloudworkstations/sway/workstation-image/configs/snippets/snippets.conf" | \
         ws_pipe "mkdir -p ~/.config/snippets && cat > ~/.config/snippets/snippets.conf"
     test_pass "Snippet picker deployed"
 else
@@ -657,14 +657,14 @@ fi
 
 # Deploy tmux.conf (tmux module)
 if ws_ssh '. ~/.local/bin/ws-modules.sh 2>/dev/null && ws_module_enabled tmux && echo yes || echo no' 2>/dev/null | grep -q "yes"; then
-    cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/configs/tmux/tmux.conf" | \
+    cat "${REPO_DIR}/cloudworkstations/sway/workstation-image/configs/tmux/tmux.conf" | \
         ws_pipe "cat > ~/.tmux.conf"
     test_pass "tmux.conf deployed"
 
     # Deploy claude-tmux and tmux-debug scripts
-    cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/scripts/claude-tmux" | \
+    cat "${REPO_DIR}/cloudworkstations/sway/workstation-image/scripts/claude-tmux" | \
         ws_pipe "mkdir -p ~/.local/bin && cat > ~/.local/bin/claude-tmux && chmod +x ~/.local/bin/claude-tmux"
-    cat "${REPO_DIR}/CloudWorkstations-Sway/workstation-image/scripts/tmux-debug" | \
+    cat "${REPO_DIR}/cloudworkstations/sway/workstation-image/scripts/tmux-debug" | \
         ws_pipe "cat > ~/.local/bin/tmux-debug && chmod +x ~/.local/bin/tmux-debug"
     test_pass "claude-tmux and tmux-debug deployed"
 else

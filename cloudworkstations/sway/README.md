@@ -26,8 +26,8 @@ gcloud auth login
 ### Step 2: Clone and run setup
 
 ```bash
-git clone https://github.com/your-github-username/cloud-workstations.git
-cd cloud-workstations
+git clone https://github.com/your-github-username/platform-ops.git
+cd platform-ops/cloudworkstations/sway
 bash scripts/ws.sh setup -p YOUR_PROJECT_ID
 ```
 

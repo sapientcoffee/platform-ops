@@ -233,6 +233,7 @@ if [ "$COMMAND" = "setup" ]; then
                 gcloud projects add-iam-policy-binding "$PROJECT_ID" \
                     --member="serviceAccount:${SA}" \
                     --role="$ROLE" \
+                    --condition=None \
                     --quiet --format=none 2>&1 || true
             fi
         done
@@ -262,12 +263,26 @@ steps:
     id: 'clone-repo'
 
   - name: 'gcr.io/cloud-builders/gcloud'
-    entrypoint: 'bash'
+    entrypoint: '/bin/bash'
     args:
       - '-c'
       - |
-        cd /workspace/repo
-        bash CloudWorkstations-Sway/scripts/cloud-build-setup.sh "${PROJECT_ID}" "${_CB_REGION}" "${_CB_WEBHOOK_URL}" "${_CB_EMAIL_FUNC_URL}" "${_CB_EMAIL}" "${_CB_USER_ACCOUNT}" "${_CB_PROFILE}"
+        echo "Current directory: $(pwd)"
+        if [ -d "/workspace/repo" ]; then
+          cd /workspace/repo
+          echo "Listing /workspace/repo:"
+          ls -F
+          if [ -f "cloudworkstations/sway/scripts/cloud-build-setup.sh" ]; then
+            bash cloudworkstations/sway/scripts/cloud-build-setup.sh "${PROJECT_ID}" "${_CB_REGION}" "${_CB_WEBHOOK_URL}" "${_CB_EMAIL_FUNC_URL}" "${_CB_EMAIL}" "${_CB_USER_ACCOUNT}" "${_CB_PROFILE}"
+          else
+            echo "ERROR: cloud-build-setup.sh not found at cloudworkstations/sway/scripts/cloud-build-setup.sh"
+            ls -R cloudworkstations/sway/scripts/ || echo "scripts directory not found"
+            exit 127
+          fi
+        else
+          echo "ERROR: /workspace/repo not found"
+          exit 127
+        fi
 
     id: 'run-setup'
     waitFor: ['clone-repo']

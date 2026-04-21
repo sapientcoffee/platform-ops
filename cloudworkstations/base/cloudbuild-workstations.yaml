@@ -4,7 +4,7 @@ steps:
   args: [
     "--destination=europe-docker.pkg.dev/coffee-plantation/workstation/codeoss:latest",
     "--destination=europe-docker.pkg.dev/coffee-plantation/workstation/codeoss:$COMMIT_SHA",
-    "--dockerfile=./CloudWorkstations/Dockerfile",
+    "--dockerfile=./cloudworkstations/base/Dockerfile",
     "--context=dir:///workspace",
     "--cache=true",
     "--cache-ttl=24h"]
