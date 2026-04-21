@@ -262,7 +262,7 @@ steps:
     args: ['clone', '${_CB_REPO_URL}', '/workspace/repo']
     id: 'clone-repo'
 
-  - name: 'gcr.io/cloud-builders/gcloud'
+  - name: 'google/cloud-sdk'
     entrypoint: '/bin/bash'
     args:
       - '-c'
@@ -297,7 +297,6 @@ substitutions:
   _CB_USER_ACCOUNT: ''
   _CB_PROFILE: 'full'
 options:
-  logging: CLOUD_LOGGING_ONLY
   machineType: 'E2_HIGHCPU_8'
 
 BUILDEOF
