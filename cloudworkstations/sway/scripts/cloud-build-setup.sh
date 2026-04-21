@@ -314,7 +314,7 @@ else
         --machine-type=n1-standard-16 \
         --accelerator-type=nvidia-tesla-t4 --accelerator-count=1 \
         --boot-disk-size=50 \
-        --pd-reclaim-policy=RETAIN \
+        --pd-reclaim-policy=retain \
         --pd-disk-type=pd-ssd \
         --pd-disk-size=500 \
         --container-custom-image="$IMAGE" \
