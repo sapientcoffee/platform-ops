@@ -304,9 +304,15 @@ test_pass "Service agent permissions granted"
 # =========================================================================
 step "Step 7/19: Create Workstation Config"
 # =========================================================================
+COMPUTE_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+
 if gcloud workstations configs describe "$CONFIG" \
     --cluster="$CLUSTER" --region="$REGION" --project="$PROJECT_ID" >/dev/null 2>&1; then
-    log "Config already exists — skipping"
+    log "Config already exists — updating with service account"
+    retry 2 10 gcloud workstations configs update "$CONFIG" \
+        --cluster="$CLUSTER" --region="$REGION" \
+        --service-account="$COMPUTE_SA" \
+        --project="$PROJECT_ID"
 else
     # Must specify --service-account so workstation VMs can pull the custom image
     retry 2 10 gcloud workstations configs create "$CONFIG" \
@@ -318,6 +324,7 @@ else
         --pd-disk-type=pd-ssd \
         --pd-disk-size=500 \
         --container-custom-image="$IMAGE" \
+        --service-account="$COMPUTE_SA" \
         --project="$PROJECT_ID"
 fi
 
