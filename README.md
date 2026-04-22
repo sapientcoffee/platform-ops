@@ -6,55 +6,41 @@ Welcome to the **Platform Ops** repository! 🌟 This is a curated collection of
 
 ## ☕ The Roasting Machine: Cloud Developer Workstations
 
-Cloud Developer Environments are the "espresso shots" of productivity. They help development teams skip the bitter taste of environment setup and get straight to the "caffeine kick" of coding. On Google Cloud, the premium blend is [Cloud Workstations](https://cloud.google.com/workstations).
+Cloud Developer Environments are the "espresso shots" of productivity. On Google Cloud, the premium blend is [Cloud Workstations](https://cloud.google.com/workstations), now enhanced with our custom **Local Barista** orchestration.
 
-### 🌟 Why Cloud Workstations?
-*   **Fresh Onboarding**: Get new developers brewing code in minutes, not days.
-*   **Security Filter**: Keep source code secure with exfiltration guardrails and private network access.
-*   **High-End Grinders**: Need a GPU or 32 vCPUs? Scale your machine to match the task.
-*   **Consistent Flavor**: Everyone works on the same secure, pre-configured image.
-
-### 👥 The Personas
-*   **The Master Roasters (Admins/Platform Engineers)**: Manage the environments, security policies, and base images.
-*   **The Baristas (Developers)**: Consume on-demand, high-performance environments from anywhere with a browser or local IDE.
+### 🌟 Why our Cloud Workstations?
+*   **Local-First Orchestration**: Deploy infrastructure and bootstrap your machine locally for full visibility and real-time feedback.
+*   **GPU-Powered Desktop**: High-performance Sway (Wayland) environments with NVIDIA T4 support.
+*   **Automated Freshness**: Built-in triggers to re-roast your images weekly and on every configuration change.
+*   **AI-Native Toolkit**: Gemini CLI, Claude Code, and Antigravity come pre-installed and ready to serve.
 
 ---
 
 ## 📅 Tasting Notes: The Evolution of CDE on GCP
 
-Over the years, the way we brew code on Google Cloud has evolved significantly:
+Over the years, our "roasts" have become bolder and more automated:
 
-*   **2016** -> **Cloud Shell** 🐚 (The classic instant coffee: pre-configured, free, and accessible).
-*   **2019** -> **[Cloud Code](https://cloud.google.com/code)** 🛠️ (The first automation tools for your local IDE).
-*   **2020** -> **Cloud Shell Editor** ✍️ (An upgraded IDE experience in the browser).
-*   **2023** -> **[Cloud Workstations](https://cloud.google.com/workstations)** 🏗️ (The professional espresso machine: enterprise-grade, customizable, and secure).
-*   **2023** -> **[Project IDX](https://developers.google.com/idx)** ✨ (Experimental multiplatform development workflow).
+*   **2016** -> **Cloud Shell** 🐚 (The classic instant coffee: pre-configured and accessible).
+*   **2023** -> **[Cloud Workstations](https://cloud.google.com/workstations)** 🏗️ (The professional espresso machine: secure and scalable).
 *   **2024** -> **AI Assisted Dev** 🚀 (GenAI integration starts roasting in every workflow).
-*   **2025** -> **AI Assisted Dev** 🤖 (The era of AI agents like Jules; **Gemini CLI** becomes the essential tool in the barista's belt).
-*   **2026** -> **AI Assisted Dev** ✨ (The "Enterprise" release of Antigravity takes CDEs to a new dimension).
-
----
-
-## 🖼️ The Brew Process: High-Level Overview
-
-The following diagram illustrates how we transition from legacy setups to modern, powerful Cloud Workstations:
-
-![](Remote-Developer-Environment.jpg)
-
-*(Note: Our legacy Cloud Shell and GitPod examples have been moved to the [archive/](./archive/) folder to make room for the new workstation beans!)*
+*   **2025** -> **The Gemini Era** 🤖 (Gemini CLI becomes the essential tool in the barista's belt).
+*   **2026** -> **The Workstation Cafe** ✨ (Local orchestration and "Enterprise" Antigravity take productivity to a new dimension).
 
 ---
 
 ## 📂 What's in the Bag?
 
-### 🏗️ [Google Cloud Workstations](./cloudworkstations/base/)
-The main course. Dive here for Dockerfiles, startup scripts, and Terraform automation to stand up your own workstation clusters. Now featuring **YADM** for seamless dotfile management!
+### ☕ [The Workstation Cafe (Sway & Nix)](./cloudworkstations/sway/)
+Our flagship GPU environment. Features local orchestration (`workstation.sh`), Sway desktop via noVNC, and a full Nix/Home Manager package manager.
+
+### 🏗️ [Google Cloud Workstations (Base)](./cloudworkstations/base/)
+The foundation. Dockerfiles and Terraform automation for standing up standard workstation clusters with **YADM** for dotfile management.
+
+### 🤖 [Cloud Builder: Gemini CLI](./cloud-builder-geminicli/)
+A specialized Google Cloud Builder image for **Gemini CLI**, enabling AI-powered automation steps directly within your CI/CD pipelines.
 
 ### 🛰️ [Antigravity GCE Desktop](./gce/antigravity-remote-desktop/)
-A high-performance dedicated VM environment for GUI-intensive IDEs like Antigravity, optimized for low-latency access via Chrome Remote Desktop.
-
-### 🧪 [Other Experiments](./cloud_build_codey/)
-*   **Cloud Build Codey**: An early experiment in AI-driven builds. Note that this has moved to a more advanced roast over at [GitLab](https://gitlab.com/robedwards/coffee-and-codey.git).
+A high-performance dedicated VM environment optimized for GUI-intensive IDEs like Antigravity, accessible via Chrome Remote Desktop.
 
 ---
 
