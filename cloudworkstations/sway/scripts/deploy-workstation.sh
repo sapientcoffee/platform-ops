@@ -172,8 +172,7 @@ else
         --substitutions="_REGION=${REGION},_AR_REPO=${AR_REPO}" \
         --project="$PROJECT_ID" \
         --region="$REGION" \
-        --timeout=1800 \
-        --quiet; then
+        --timeout=1800; then
         test_pass "Docker image frothed and pushed"
         notify "🍦 Progress: Image Ready" "Project: ${PROJECT_ID}" "The image is ready. Deploying the infrastructure next..."
     else
