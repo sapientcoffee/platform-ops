@@ -4,7 +4,7 @@ GPU-powered Cloud Workstation in GCP with Sway desktop, Nix package manager, and
 
 ## Inspiration & Credits
 
-This project is inspired by and based on the work in [ameer00/cloud-workstations](https://github.com/ameer00/cloud-workstations/tree/main), which served as the starting point for this GPU-accelerated Sway environment.
+This project is inspired by and based on the work in [ameer00/cloud-workstations](https://github.com/ameer00/cloud-workstations/tree/main), which served as the **starting point and inspiration** for this GPU-accelerated Sway environment.
 
 ## Architecture: Local Deployment
 
