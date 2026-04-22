@@ -18,10 +18,9 @@ steps:
     - |
       set -e
       echo "Running Smoke Tests..."
-      # Check for critical binaries
-      which wayvnc
+      # Check for critical binaries installed in the base image
       which tailscale
-      sway --version
+      which google-chrome-stable
       echo "✅ Base utilities verified!"
   id: "smoke-test"
   waitFor: ["build"]
