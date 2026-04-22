@@ -2,18 +2,38 @@
 
 GPU-powered Cloud Workstation in GCP with Sway desktop, Nix package manager, and a full dev environment — accessible from any browser via noVNC.
 
+## Inspiration & Credits
+
+This project is inspired by and based on the work in [ameer00/cloud-workstations](https://github.com/ameer00/cloud-workstations/tree/main), which served as the starting point for this GPU-accelerated Sway environment.
+
+## Architecture: Local Deployment
+
+The setup tool (`scripts/workstation.sh setup`) orchestrates the deployment **locally** from your machine while utilizing specialized Google Cloud services for heavy lifting. The automation suite has been engineered for robustness and maintainability:
+
+1.  **Shared Utility Library (`scripts/lib.sh`)**: Centralized logging (color-coded), error handling (with line-number reporting), and dynamic step tracking for a consistent and professional CLI experience.
+2.  **Centralized Configuration (`scripts/config.env`)**: Manage machine specs (GPU, RAM, Disk) and resource names in one place.
+3.  **Local Orchestration**: 
+    - Coordinates infrastructure provisioning (VPC, NAT, Cluster, Config).
+    - Performs the workstation bootstrap over SSH using simplified, standalone remote scripts (`scripts/remote/`).
+    - Provides real-time feedback and pre-flight checks, including **GPU Quota verification** and dependency validation.
+4.  **Workstation Image Build**: 
+    - If no image is found, it triggers a Cloud Build job using `cloudworkstations/sway/cloudbuild-image.yaml`.
+    - Integrates Sway desktop, `wayvnc`, `noVNC`, and mesh networking via Tailscale.
+
+This process is fully idempotent; re-running `workstation.sh setup` will skip existing resources and detected images to save time. ☕🚀
+
 ## Quick Start
 
 1. Fork and clone this repo
-2. Run `bash scripts/ws.sh setup -p YOUR_PROJECT_ID`
+2. Run `bash scripts/workstation.sh setup --project YOUR_PROJECT_ID --api-key YOUR_API_KEY`
 
 ## Setup
 
 ### Prerequisites
 
 1. A GCP project where you have **Owner** role
-2. **NVIDIA T4 GPU quota** in `us-west1` (at least 1) — [check/request quota here](https://console.cloud.google.com/iam-admin/quotas?metric=NVIDIA_T4_GPUS)
-3. **Cloud Shell** (recommended) or any terminal with `gcloud` CLI
+2. **NVIDIA T4 GPU quota** in `us-central1` (at least 1) — [check/request quota here](https://console.cloud.google.com/iam-admin/quotas?metric=NVIDIA_T4_GPUS)
+3. **Cloud Shell** (recommended) or any terminal with `gcloud` CLI (plus `jq`, `git`, `curl`, `tar`)
 
 ### Step 1: Authenticate
 
@@ -23,17 +43,15 @@ Open [Cloud Shell](https://shell.cloud.google.com) and run:
 gcloud auth login
 ```
 
-### Step 2: Clone and run setup
+### Step 2: Clone and deploy
 
 ```bash
 git clone https://github.com/your-github-username/platform-ops.git
 cd platform-ops/cloudworkstations/sway
-bash scripts/ws.sh setup -p YOUR_PROJECT_ID
+bash scripts/workstation.sh setup --project YOUR_PROJECT_ID --api-key "YOUR_GOOGLE_API_KEY"
 ```
 
-Replace `YOUR_PROJECT_ID` with your GCP project ID. The repo URL is auto-detected from your git remote — no configuration needed.
-
-**You can close your terminal immediately after the script prints the build ID.** All work runs inside Cloud Build and will continue independently.
+Replace `YOUR_PROJECT_ID` with your GCP project ID and provide your API Key. The script now uses flag-based arguments for clarity and provides colorized, real-time feedback.
 
 ### Step 3 (optional): Get notified when it's done
 
@@ -42,40 +60,24 @@ Replace `YOUR_PROJECT_ID` with your GCP project ID. The repo URL is auto-detecte
 1. Open [Google Chat](https://chat.google.com) → Create a Space → Space name → **Apps & integrations** → **Manage webhooks** → Copy URL
 
 ```bash
-bash scripts/ws.sh setup -p YOUR_PROJECT_ID -w "YOUR_WEBHOOK_URL"
-```
-
-#### Email
-
-```bash
-bash scripts/ws.sh setup -p YOUR_PROJECT_ID -e "you@example.com"
-```
-
-#### Both
-
-```bash
-bash scripts/ws.sh setup -p YOUR_PROJECT_ID -w "YOUR_WEBHOOK_URL" -e "you@example.com"
+bash scripts/workstation.sh setup --project YOUR_PROJECT_ID --api-key "..." --webhook "YOUR_WEBHOOK_URL"
 ```
 
 You'll receive notifications when:
-- Build starts (with link to Cloud Console)
-- Docker image is built
-- Workstation is running
-- Setup completes (with workstation URL) or fails (with error details)
+- Deployment started
+- Image frothed (if a rebuild was needed)
+- Machine is warm
+- Deployment complete (with workstation URL) or spilled (with error details)
 
 ### Track progress
 
-The setup script prints a Cloud Console link. You can also stream logs:
+The setup script uses dynamic step tracking (e.g., `Step 1/12`) to keep you informed of exactly where the deployment stands.
 
-```bash
-gcloud builds log BUILD_ID --stream --project=YOUR_PROJECT_ID --region=us-west1
-```
-
-### Install Profiles
+### Bean Blends (Install Profiles)
 
 Choose a profile to control what gets installed:
 
-| Profile | What's Included | Build Time |
+| Blend | What's Included | Brew Time |
 |---------|----------------|------------|
 | `minimal` | Sway desktop, ZSH, Chrome, Antigravity, dev tools | ~14 min |
 | `dev` | minimal + tmux + Claude Code | ~25 min |
@@ -84,19 +86,34 @@ Choose a profile to control what gets installed:
 
 ```bash
 # Default (full profile)
-bash scripts/ws.sh setup -p YOUR_PROJECT_ID
+bash scripts/workstation.sh setup --project YOUR_PROJECT_ID --api-key YOUR_API_KEY
 
 # Minimal profile (fastest)
-bash scripts/ws.sh setup -p YOUR_PROJECT_ID --profile minimal
-
-# AI profile (IDEs + AI tools, no languages)
-bash scripts/ws.sh setup -p YOUR_PROJECT_ID --profile ai
+bash scripts/workstation.sh setup --project YOUR_PROJECT_ID --api-key YOUR_API_KEY --profile minimal
 
 # Custom modules
-bash scripts/ws.sh setup -p YOUR_PROJECT_ID --profile custom --modules "ides,ai-tools"
+bash scripts/workstation.sh setup --project YOUR_PROJECT_ID --api-key YOUR_API_KEY --profile custom --modules "ides,ai-tools"
 ```
 
 The `~/.ws-modules` config file records which modules are enabled. Boot scripts and tests automatically adapt to the selected profile.
+
+### Automated Image Updates (Optional)
+
+To set up automated triggers:
+
+```bash
+bash scripts/workstation.sh triggers --project YOUR_PROJECT_ID [--region REGION] [--repo-name REPO] [--repo-owner OWNER]
+```
+
+*Note: The "On Change" trigger requires that you have already connected your GitHub repository to Cloud Build in the GCP Console.*
+
+## Advanced Configuration
+
+The deployment is controlled by `scripts/config.env`. You can modify this file to customize:
+- `MACHINE_TYPE`: default `n1-standard-16`
+- `ACCELERATOR_TYPE`: default `nvidia-tesla-t4`
+- `DISK_SIZE`: default `500` (GB)
+- `REGION`: default `us-central1`
 
 ## After Setup
 
@@ -108,7 +125,7 @@ The setup script stops the workstation at the end to save costs. Start it when y
 gcloud workstations start dev-workstation \
   --config=ws-config \
   --cluster=workstation-cluster \
-  --region=us-west1 \
+  --region=us-central1 \
   --project=YOUR_PROJECT_ID
 ```
 
@@ -120,7 +137,7 @@ Get the workstation URL:
 gcloud workstations describe dev-workstation \
   --config=ws-config \
   --cluster=workstation-cluster \
-  --region=us-west1 \
+  --region=us-central1 \
   --project=YOUR_PROJECT_ID \
   --format="value(host)"
 ```
@@ -242,37 +259,53 @@ Tests cover: Nix, GPU, Sway, fonts, shell, AI tools, IDEs, languages, keybinding
 The setup is fully **idempotent**. If it fails or you want to update, just run it again:
 
 ```bash
-bash scripts/ws.sh setup -p YOUR_PROJECT_ID
+bash scripts/workstation.sh setup -p YOUR_PROJECT_ID -k YOUR_API_KEY
 ```
 
 Existing resources are detected and skipped. Only missing components are created.
 
-## Teardown / Cleanup
+## Teardown / Resource Cleanup
 
 To delete **all** resources created by setup (workstation, cluster, images, NAT, scheduler):
 
 ```bash
-bash scripts/ws.sh teardown -p YOUR_PROJECT_ID
+bash scripts/workstation.sh teardown --project YOUR_PROJECT_ID
 ```
 
-Add `-y` to skip the confirmation prompt. Add `-w` / `-e` for notifications.
+### Dry Run Mode (Safety First)
+To see exactly what would be deleted without executing any destructive commands:
+```bash
+bash scripts/workstation.sh teardown --project YOUR_PROJECT_ID --dry-run
+```
 
 This is useful for:
 - Testing setup from scratch
 - Cleaning up a project you no longer need
 - Freeing GPU quota for another project
 
-After teardown, you can re-run `setup.sh` to recreate everything.
+After teardown, you can re-run `setup` to recreate everything.
+
+## Project Structure
+
+| File | Purpose |
+|------|---------|
+| `scripts/workstation.sh` | Main entry point for setup, teardown, and triggers. |
+| `scripts/deploy-workstation.sh` | Core infrastructure and bootstrap logic. |
+| `scripts/config.env` | Centralized environment variables and machine specs. |
+| `scripts/lib.sh` | Shared utility library (logging, retry, notify, etc.). |
+| `scripts/remote/` | Standalone scripts pushed to and executed on the workstation. |
+| `workstation-image/` | Dockerfile and configuration for the base workstation image. |
+| `dev-fonts/` | Developer fonts deployed during setup. |
 
 ## Troubleshooting
 
 | Issue | Fix |
 |-------|-----|
-| "No GPU quota" | [Request NVIDIA_T4_GPUS quota](https://console.cloud.google.com/iam-admin/quotas) in us-west1 (at least 1) |
-| Build fails mid-way | Re-run `ws.sh setup` — it picks up where it left off (idempotent) |
+| "No GPU quota" | [Request NVIDIA_T4_GPUS quota](https://console.cloud.google.com/iam-admin/quotas) in us-central1 (at least 1) |
+| Build fails mid-way | Re-run `workstation.sh setup` — it picks up where it left off (idempotent) |
 | Can't connect via noVNC | Ensure workstation is started, wait 30s for Sway + wayvnc to boot |
 | Apps not on workspaces | Wait 15-20s after boot for auto-launch to complete |
-| Cloud Shell disconnected | No problem — Cloud Build continues independently. Check progress in Cloud Console |
+| Cloud Shell disconnected | **Warning:** Since the script runs locally, disconnection will pause the deployment. Use a persistent session or keep the window active. |
 | IDE keybinding not working | Check `~/logs/boot-test-results.txt` for related FAIL entries |
 | Claude Code not working | Ensure `~/.env` has your API keys — it's sourced automatically on boot |
 | Boot test failures | Run `cat ~/logs/boot-test-results.txt` to see full PASS/FAIL details |

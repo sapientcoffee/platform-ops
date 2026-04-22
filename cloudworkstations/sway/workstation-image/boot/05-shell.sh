@@ -145,6 +145,29 @@ if command -v starship &>/dev/null; then
     eval "$(starship init zsh)"
 fi
 
+# YADM First Run
+if [ ! -f "$HOME/.yadm_initialized" ] && [[ $- == *i* ]]; then
+    echo "=========================================================="
+    echo " ☕ Welcome! No dotfiles detected (YADM)."
+    echo "=========================================================="
+    echo "If you have a dotfiles repo, enter the URL below (HTTPS or SSH)."
+    echo "Leave blank to skip YADM setup."
+    echo -n "Repo URL: "
+    read YADM_REPO
+    if [ -n "$YADM_REPO" ]; then
+        echo "🔥 Cloning dotfiles..."
+        if yadm clone "$YADM_REPO"; then
+            touch "$HOME/.yadm_initialized"
+            echo "✅ Dotfiles installed. You may need to restart your shell."
+        else
+            echo "❌ Failed to clone. We'll try again on next login."
+        fi
+    else
+        echo "⏭️  Skipping YADM. Run 'touch ~/.yadm_initialized' to hide this."
+    fi
+    echo ""
+fi
+
 # User customizations (survives boot — never overwritten)
 if [ -f "$HOME/.zshrc.local" ]; then
     source "$HOME/.zshrc.local"

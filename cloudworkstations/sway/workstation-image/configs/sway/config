@@ -62,6 +62,11 @@ output HEADLESS-1 resolution 1920x1080
 # -----------------------------------------------------------------------------
 focus_follows_mouse yes
 
+# Set keyboard layout to UK
+input * {
+    xkb_layout gb
+}
+
 # Cursor theme
 seat seat0 xcursor_theme default 24
 

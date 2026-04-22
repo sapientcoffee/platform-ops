@@ -119,6 +119,7 @@ log ""
 if ws_module_enabled "ai-tools"; then
     log "--- AI CLI Tools ---"
     check_binary "Claude Code" "claude"
+    check_binary "Gemini CLI" "gemini"
     check_binary "Codex" "codex"
     check_binary "OpenCode" "opencode"
     check_binary "Cody" "cody"
@@ -192,6 +193,11 @@ if runuser -u $USER -- bash -c ". $NIX_SH && home-manager --version" >/dev/null 
     test_pass "home-manager available"
 else
     test_fail "home-manager not available"
+fi
+if runuser -u $USER -- bash -c ". $NIX_SH && yadm --version" >/dev/null 2>&1; then
+    test_pass "yadm available"
+else
+    test_fail "yadm not available"
 fi
 
 # =============================================================================
