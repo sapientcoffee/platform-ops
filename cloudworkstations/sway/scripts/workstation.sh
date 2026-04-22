@@ -64,16 +64,18 @@ PROFILE="full"
 CUSTOM_MODULES=""
 SKIP_CONFIRM=false
 DRY_RUN=false
+FORCE_REBUILD=false
 
 while [[ $# -gt 0 ]]; do
     case $1 in
-        -p|--project)  PROJECT_ID="$2"; shift 2 ;;
-        --profile)     PROFILE="$2"; shift 2 ;;
-        --modules)     CUSTOM_MODULES="$2"; PROFILE="custom"; shift 2 ;;
-        -w|--webhook)  WEBHOOK_URL="$2"; shift 2 ;;
-        -y|--yes)      SKIP_CONFIRM=true; shift ;;
-        --dry-run)     DRY_RUN=true; shift ;;
-        -h|--help)     usage ;;
+        -p|--project)      PROJECT_ID="$2"; shift 2 ;;
+        --profile)         PROFILE="$2"; shift 2 ;;
+        --modules)         CUSTOM_MODULES="$2"; PROFILE="custom"; shift 2 ;;
+        --force-rebuild)   FORCE_REBUILD=true; shift ;;
+        -w|--webhook)      WEBHOOK_URL="$2"; shift 2 ;;
+        -y|--yes)          SKIP_CONFIRM=true; shift ;;
+        --dry-run)         DRY_RUN=true; shift ;;
+        -h|--help)         usage ;;
         *) log_warn "Unknown option: $1"; shift ;;
     esac
 done

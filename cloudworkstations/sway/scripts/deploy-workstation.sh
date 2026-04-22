@@ -153,11 +153,15 @@ fi
 step "Building the Docker Image"
 # =========================================================================
 log_info "🔎 Checking if we already have fresh beans (Image)..."
-if gcloud artifacts docker images list "${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPO}/workstation" \
+IMAGE_NAME="${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPO}/workstation"
+if [ "$FORCE_REBUILD" = false ] && gcloud artifacts docker images list "$IMAGE_NAME" \
     --project="$PROJECT_ID" --format="value(package)" --limit=1 2>/dev/null | grep -q "workstation"; then
     log_info "  ✅ Image found in registry. Skipping the froth to save time."
     test_pass "Docker image already exists"
 else
+    if [ "$FORCE_REBUILD" = true ]; then
+        log_info "  🔥 Force rebuild requested. Roasting a fresh batch..."
+    fi
     log_info "  🏗️  Building the workstation image (this takes a while)..."
     cd "${REPO_DIR}"
     if retry 2 30 gcloud builds submit \

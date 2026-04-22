@@ -86,10 +86,13 @@ Choose a profile to control what gets installed:
 
 ```bash
 # Default (full profile)
-bash scripts/workstation.sh setup --project YOUR_PROJECT_ID 
+bash scripts/workstation.sh setup --project YOUR_PROJECT_ID
+
+# Force a fresh image build (even if one exists)
+bash scripts/workstation.sh setup --project YOUR_PROJECT_ID --force-rebuild
 
 # Minimal profile (fastest)
-bash scripts/workstation.sh setup --project YOUR_PROJECT_ID  --profile minimal
+bash scripts/workstation.sh setup --project YOUR_PROJECT_ID --profile minimal
 
 # Custom modules
 bash scripts/workstation.sh setup --project YOUR_PROJECT_ID  --profile custom --modules "ides,ai-tools"
