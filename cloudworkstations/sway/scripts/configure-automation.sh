@@ -62,7 +62,7 @@ else
         --branch-pattern="^main$" \
         --build-config="cloudworkstations/sway/cloudbuild-image.yaml" \
         --included-files="cloudworkstations/sway/workstation-image/**" \
-        --substitutions="_REGION=${REGION},_AR_REPO=${AR_REPO}" \
+        --substitutions="_REGION=${REGION},_AR_REPO=${AR_REPO},_TAG=\$SHORT_SHA" \
         --description="Rebuilds image when the configuration changes" \
         --quiet) || log_warn "Could not create GitHub trigger (is the repo connected?)"
 fi
@@ -85,7 +85,7 @@ gcloud builds triggers create pubsub \
     --repo-type="GITHUB" \
     --branch="main" \
     --build-config="cloudworkstations/sway/cloudbuild-image.yaml" \
-    --substitutions="_REGION=${REGION},_AR_REPO=${AR_REPO}" \
+    --substitutions="_REGION=${REGION},_AR_REPO=${AR_REPO},_TAG=weekly" \
     --description="Weekly Tuesday roast" \
     --quiet || log_warn "Could not create Pub/Sub trigger. You may need to connect your repository in the GCP Console first."
 

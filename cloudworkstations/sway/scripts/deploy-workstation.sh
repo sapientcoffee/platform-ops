@@ -166,10 +166,17 @@ else
         log_info "  🔥 Force rebuild requested. Roasting a fresh batch..."
     fi
     log_info "  🏗️  Building image and streaming logs (this takes 10-15 min)..."
+    
+    # Try to get short SHA for tagging
+    LOCAL_TAG="manual"
+    if command -v git &>/dev/null && [ -d "${REPO_DIR}/.git" ]; then
+        LOCAL_TAG=$(git -C "${REPO_DIR}" rev-parse --short HEAD 2>/dev/null || echo "manual")
+    fi
+
     cd "${REPO_DIR}"
     if retry 2 30 gcloud builds submit \
         --config=cloudworkstations/sway/cloudbuild-image.yaml \
-        --substitutions="_REGION=${REGION},_AR_REPO=${AR_REPO}" \
+        --substitutions="_REGION=${REGION},_AR_REPO=${AR_REPO},_TAG=${LOCAL_TAG}" \
         --project="$PROJECT_ID" \
         --region="$REGION" \
         --timeout=1800; then
