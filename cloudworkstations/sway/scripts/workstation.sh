@@ -155,7 +155,9 @@ if [ "$COMMAND" = "setup" ]; then
     if [ "$TRIGGER_COUNT" -ge 2 ]; then
         log_info "  ✅ Automated triggers are already configured."
     else
-        log_info "  ⏰ Triggers are missing. I'll remind you to run 'triggers' later."
+        log_info "  🆕 Triggers are missing. Configuring automated roasting now..."
+        bash "${SCRIPT_DIR}/configure-automation.sh" --project "$PROJECT_ID" --region "$REGION"
+        log_info "  ✅ Automated triggers successfully added to your order."
     fi
 
     # --- Ensure default VPC network exists ---
@@ -215,7 +217,8 @@ if [ "$COMMAND" = "setup" ]; then
         --webhook "${WEBHOOK_URL}" \
         --account "${ACCOUNT}" \
         --profile "${PROFILE}" \
-        --modules "${CUSTOM_MODULES}"
+        --modules "${CUSTOM_MODULES}" \
+        $( [ "$FORCE_REBUILD" = true ] && echo "--force-rebuild" )
 
     echo -e "${BLUE}=============================================${NC}"
     echo " 🎉 Order fulfilled successfully!"

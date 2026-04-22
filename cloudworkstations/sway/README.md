@@ -100,15 +100,20 @@ bash scripts/workstation.sh setup --project YOUR_PROJECT_ID  --profile custom --
 
 The `~/.ws-modules` config file records which modules are enabled. Boot scripts and tests automatically adapt to the selected profile.
 
-### Automated Image Updates (Optional)
+### Automated Image Updates
 
-To set up automated triggers:
+The `setup` script automatically configures automated triggers if they don't already exist. You'll be notified during the deployment if they are being added.
+
+1.  **Roast on Change**: Rebuilds the image when you update the recipe in `workstation-image/`.
+2.  **Weekly Roast**: Rebuilds every Tuesday at 2:00 PM PT to pick up OS security updates.
+
+To manually re-configure or update triggers:
 
 ```bash
 bash scripts/workstation.sh triggers --project YOUR_PROJECT_ID [--region REGION] [--repo-name REPO] [--repo-owner OWNER]
 ```
 
-*Note: The "On Change" trigger requires that you have already connected your GitHub repository to Cloud Build in the GCP Console.*
+*Note: The "Roast on Change" trigger requires that you have already connected your GitHub repository to Cloud Build in the GCP Console.*
 
 ## Advanced Configuration
 
