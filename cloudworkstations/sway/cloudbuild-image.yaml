@@ -32,7 +32,7 @@ steps:
   id: "scan"
   waitFor: ["build"]
 
-timeout: '3600s'
+timeout: '7200s'
 substitutions:
   _REGION: 'us-central1'
   _AR_REPO: 'workstation-images'

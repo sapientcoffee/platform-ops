@@ -20,23 +20,9 @@ FROM us-central1-docker.pkg.dev/cloud-workstations-images/predefined/base
 # Use ARG to avoid apt-get warnings
 ARG DEBIAN_FRONTEND=noninteractive
 
-# Install and configure systemd.
+# 📦 Step 1: Base System & GNOME Minimal
 RUN apt-get update && apt-get install -y \
-  systemd && \
-  apt-get clean && \
-  rm -rf /var/lib/apt/lists/* &&\
-  ln -s /dev/null /etc/systemd/system/apache2.service && \
-  ln -s /dev/null /etc/systemd/system/getty@tty1.service && \
-  ln -s /dev/null /etc/systemd/system/ldconfig.service && \
-  /sbin/ldconfig -Xv && \
-  ln -s /dev/null /etc/systemd/system/systemd-modules-load.service && \
-  ln -s /dev/null /etc/systemd/system/ssh.socket && \
-  ln -s /dev/null /etc/systemd/system/ssh.service && \
-  echo "d /run/sshd 0755 root root" > /usr/lib/tmpfiles.d/sshd.conf && \
-  echo -e "x /run/docker.socket - - - - -\nx /var/run/docker.socket - - - - -" > /usr/lib/tmpfiles.d/docker.conf
-
-# Install GNOME
-RUN apt-get update && apt-get install -y \
+    systemd \
     gnome-software \
     gnome-software-common \
     gnome-software-plugin-snap \
@@ -54,59 +40,58 @@ RUN apt-get update && apt-get install -y \
   apt-get remove -y --purge cloud-init && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/* && \
-  chmod -x /usr/lib/ubuntu-release-upgrader/check-new-release-gtk
+  chmod -x /usr/lib/ubuntu-release-upgrader/check-new-release-gtk && \
+  ln -s /dev/null /etc/systemd/system/apache2.service && \
+  ln -s /dev/null /etc/systemd/system/getty@tty1.service && \
+  ln -s /dev/null /etc/systemd/system/ldconfig.service && \
+  /sbin/ldconfig -Xv && \
+  ln -s /dev/null /etc/systemd/system/systemd-modules-load.service && \
+  ln -s /dev/null /etc/systemd/system/ssh.socket && \
+  ln -s /dev/null /etc/systemd/system/ssh.service && \
+  echo "d /run/sshd 0755 root root" > /usr/lib/tmpfiles.d/sshd.conf && \
+  echo -e "x /run/docker.socket - - - - -\nx /var/run/docker.socket - - - - -" > /usr/lib/tmpfiles.d/docker.conf
 
-# Install Antigravity
+# 📦 Step 2: Third-party Repos (Chrome, Antigravity, Tailscale)
 RUN mkdir -p /etc/apt/keyrings && \
+    # Antigravity
     curl -fsSL https://us-central1-apt.pkg.dev/doc/repo-signing-key.gpg | gpg --dearmor -o /etc/apt/keyrings/antigravity-repo-key.gpg && \
     echo "deb [signed-by=/etc/apt/keyrings/antigravity-repo-key.gpg] https://us-central1-apt.pkg.dev/projects/antigravity-auto-updater-dev/ antigravity-debian main" | tee /etc/apt/sources.list.d/antigravity.list > /dev/null && \
-    apt-get update && \
-    apt-get install -y antigravity
-
-# Install Google Chrome
-RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome-keyring.gpg && \
+    # Chrome
+    wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome-keyring.gpg && \
     echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome-keyring.gpg] http://dl.google.com/linux/chrome/deb/ stable main" | tee /etc/apt/sources.list.d/google-chrome.list > /dev/null && \
-    apt-get update && \
-    apt-get install -y google-chrome-stable
+    # Tailscale
+    curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/noble.noarmor.gpg | tee /usr/share/keyrings/tailscale-archive-keyring.gpg >/dev/null && \
+    curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/noble.tailscale-keyring.list | tee /etc/apt/sources.list.d/tailscale.list
 
-# Divert the original Chrome executable to a new location and create a wrapper script.
-# This ensures the fix persists even when the Chrome package is updated.
-RUN dpkg-divert --add --rename --divert /usr/bin/google-chrome-stable.real /usr/bin/google-chrome-stable && \
-    echo '#!/bin/bash' > /usr/bin/google-chrome-stable && \
-    echo 'exec /usr/bin/google-chrome-stable.real --no-sandbox --no-zygote --disable-gpu --disable-dev-shm-usage "$@"' >> /usr/bin/google-chrome-stable && \
-    chmod +x /usr/bin/google-chrome-stable
-
-
-# Install Tailscale
-RUN curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/noble.noarmor.gpg | tee /usr/share/keyrings/tailscale-archive-keyring.gpg >/dev/null && \
-    curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/noble.tailscale-keyring.list | tee /etc/apt/sources.list.d/tailscale.list && \
-    apt-get update && \
-    apt-get install -y tailscale && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Install TigerVNC and noVNC
-COPY --from=novnc-builder /out/noVNC /opt/noVNC
+# 📦 Step 3: Install Everything Else
 RUN apt-get update && apt-get install -y \
+    antigravity \
+    google-chrome-stable \
+    tailscale \
     dbus-x11 \
     tigervnc-common \
     tigervnc-scraping-server \
     tigervnc-standalone-server \
     tigervnc-xorg-extension \
-    python3-numpy  && \
+    python3-numpy && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/*
+
+# ⚙️ Step 4: Chrome Wrapper & Systemd Links
+RUN dpkg-divert --add --rename --divert /usr/bin/google-chrome-stable.real /usr/bin/google-chrome-stable && \
+    echo '#!/bin/bash' > /usr/bin/google-chrome-stable && \
+    echo 'exec /usr/bin/google-chrome-stable.real --no-sandbox --no-zygote --disable-gpu --disable-dev-shm-usage "$@"' >> /usr/bin/google-chrome-stable && \
+    chmod +x /usr/bin/google-chrome-stable && \
+    ln -s /etc/systemd/system/tigervnc.service /etc/systemd/system/multi-user.target.wants/ && \
+    ln -s /etc/systemd/system/novnc.service /etc/systemd/system/multi-user.target.wants/ && \
+    systemctl enable tigervnc && \
+    systemctl enable novnc
+
+# TigerVNC and noVNC
+COPY --from=novnc-builder /out/noVNC /opt/noVNC
 
 # Merge assets into the container.
 COPY assets/opt /opt
 COPY assets/. /
 
-# Run TigerVNC and noVNC as services.
-RUN ln -s /etc/systemd/system/tigervnc.service /etc/systemd/system/multi-user.target.wants/ && \
-  ln -s /etc/systemd/system/novnc.service /etc/systemd/system/multi-user.target.wants/ && \
-  systemctl enable tigervnc && \
-  systemctl enable novnc
-
-# This is implicit when extending workstations predefined images, however we are
-# including it in the sample to explicitly call-out we are overriding the
-# default entrypoint when merging assets.
 ENTRYPOINT ["/google/scripts/entrypoint.sh"]
