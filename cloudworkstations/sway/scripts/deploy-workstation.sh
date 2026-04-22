@@ -165,7 +165,7 @@ else
     if [ "$FORCE_REBUILD" = true ]; then
         log_info "  🔥 Force rebuild requested. Roasting a fresh batch..."
     fi
-    log_info "  🏗️  Building the workstation image (this takes a while)..."
+    log_info "  🏗️  Building image and streaming logs (this takes 10-15 min)..."
     cd "${REPO_DIR}"
     if retry 2 30 gcloud builds submit \
         --config=cloudworkstations/sway/cloudbuild-image.yaml \
