@@ -77,21 +77,19 @@ RUN apt-get update && apt-get install -y \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/*
 
-# ⚙️ Step 4: Chrome Wrapper & Systemd Links
-RUN dpkg-divert --add --rename --divert /usr/bin/google-chrome-stable.real /usr/bin/google-chrome-stable && \
-    echo '#!/bin/bash' > /usr/bin/google-chrome-stable && \
-    echo 'exec /usr/bin/google-chrome-stable.real --no-sandbox --no-zygote --disable-gpu --disable-dev-shm-usage "$@"' >> /usr/bin/google-chrome-stable && \
-    chmod +x /usr/bin/google-chrome-stable && \
-    ln -s /etc/systemd/system/tigervnc.service /etc/systemd/system/multi-user.target.wants/ && \
-    ln -s /etc/systemd/system/novnc.service /etc/systemd/system/multi-user.target.wants/ && \
-    systemctl enable tigervnc && \
-    systemctl enable novnc
-
 # TigerVNC and noVNC
 COPY --from=novnc-builder /out/noVNC /opt/noVNC
 
 # Merge assets into the container.
 COPY assets/opt /opt
 COPY assets/. /
+
+# ⚙️ Step 4: Chrome Wrapper & Systemd Links
+RUN dpkg-divert --add --rename --divert /usr/bin/google-chrome-stable.real /usr/bin/google-chrome-stable && \
+    echo '#!/bin/bash' > /usr/bin/google-chrome-stable && \
+    echo 'exec /usr/bin/google-chrome-stable.real --no-sandbox --no-zygote --disable-gpu --disable-dev-shm-usage "$@"' >> /usr/bin/google-chrome-stable && \
+    chmod +x /usr/bin/google-chrome-stable && \
+    systemctl enable tigervnc && \
+    systemctl enable novnc
 
 ENTRYPOINT ["/google/scripts/entrypoint.sh"]
