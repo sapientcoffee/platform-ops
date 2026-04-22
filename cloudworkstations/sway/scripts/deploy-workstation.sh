@@ -97,10 +97,8 @@ ws_ssh_long() {
 }
 
 ws_scp() {
-    retry 3 10 gcloud workstations scp "$1" "${WORKSTATION}:$2" \
-        --project="$PROJECT_ID" --region="$REGION" \
-        --cluster="$CLUSTER" --config="$CONFIG" \
-        --quiet -- -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
+    log_info "  📤 Uploading $1 to $2..."
+    cat "$1" | ws_pipe "cat > $2"
 }
 
 # Helper to pipe data into a file on the workstation
