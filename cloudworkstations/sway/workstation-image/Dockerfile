@@ -8,7 +8,9 @@ WORKDIR /out
 
 RUN git clone --quiet --depth 1 --branch $NOVNC_BRANCH https://github.com/novnc/noVNC.git && \
   cd noVNC/utils && \
-  git clone  --quiet --depth 1 --branch $WEBSOCKIFY_BRANCH https://github.com/novnc/websockify.git
+  git clone  --quiet --depth 1 --branch $WEBSOCKIFY_BRANCH https://github.com/novnc/websockify.git && \
+  # Purge test keys and certificates to satisfy security scanners
+  find /out -type f \( -name "*.pem" -o -name "*.key" \) -delete
 
 #######################################################
 # End NoVNC Builder Container
