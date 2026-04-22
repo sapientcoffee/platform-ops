@@ -211,21 +211,15 @@ fi
 # =========================================================================
 step "Setting the Temperature (Config)"
 # =========================================================================
-# Prepare environment variables for injection
-ENV_VARS="GOOGLE_CLOUD_PROJECT=${PROJECT_ID},GOOGLE_CLOUD_LOCATION=${REGION}"
-[ -n "${GOOGLE_API_KEY:-}" ] && ENV_VARS="${ENV_VARS},GOOGLE_API_KEY=${GOOGLE_API_KEY}"
-
 if gcloud workstations configs describe "$CONFIG" --cluster="$CLUSTER" --region="$REGION" --project="$PROJECT_ID" >/dev/null 2>&1; then
-    log_info "  ✅ Config exists — updating environment variables..."
+    log_info "  ✅ Config exists — ensuring service account and image are up to date..."
     retry 2 10 gcloud workstations configs update "$CONFIG" \
         --cluster="$CLUSTER" --region="$REGION" \
         --service-account="$COMPUTE_SA" \
         --project="$PROJECT_ID" \
-        --clear-container-env \
-        --container-env="$ENV_VARS" \
         --quiet
 else
-    log_info "  🏗️  Creating config..."
+    log_info "  🏗️  Creating config (GPU + 500GB SSD)..."
     retry 2 10 gcloud workstations configs create "$CONFIG" \
         --cluster="$CLUSTER" --region="$REGION" \
         --machine-type="$MACHINE_TYPE" \
@@ -233,7 +227,6 @@ else
         --pd-reclaim-policy=retain --pd-disk-type="$DISK_TYPE" --pd-disk-size="$DISK_SIZE" \
         --container-custom-image="$IMAGE" --service-account="$COMPUTE_SA" \
         --project="$PROJECT_ID" \
-        --container-env="$ENV_VARS" \
         --quiet
 fi
 

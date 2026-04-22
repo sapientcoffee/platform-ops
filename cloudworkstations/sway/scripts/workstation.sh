@@ -43,7 +43,6 @@ usage() {
     echo "Optional:"
     echo "  --profile PROFILE           Bean blend: minimal, dev, ai, full (default: full)"
     echo "  --modules MODULES           Custom flavor shots (comma-separated modules)"
-    echo "  -k, --api-key KEY           Google API Key for the workstation"
     echo "  -w, --webhook URL           Google Chat / Slack webhook for status updates"
     echo "  -y, --yes                   Skip confirmation prompt (teardown only)"
     echo "  --dry-run                   Show what would be deleted (teardown only)"
@@ -61,7 +60,6 @@ shift
 # --- Parse flags ---
 PROJECT_ID=""
 WEBHOOK_URL=""
-API_KEY=""
 PROFILE="full"
 CUSTOM_MODULES=""
 SKIP_CONFIRM=false
@@ -72,7 +70,6 @@ while [[ $# -gt 0 ]]; do
         -p|--project)  PROJECT_ID="$2"; shift 2 ;;
         --profile)     PROFILE="$2"; shift 2 ;;
         --modules)     CUSTOM_MODULES="$2"; PROFILE="custom"; shift 2 ;;
-        -k|--api-key)  API_KEY="$2"; shift 2 ;;
         -w|--webhook)  WEBHOOK_URL="$2"; shift 2 ;;
         -y|--yes)      SKIP_CONFIRM=true; shift ;;
         --dry-run)     DRY_RUN=true; shift ;;
@@ -210,7 +207,6 @@ if [ "$COMMAND" = "setup" ]; then
         "Local brew started for project ${PROJECT_ID}. I'll ping you when it's ready!"
 
     # Execute the deployment script locally with flags
-    export GOOGLE_API_KEY="$API_KEY"
     bash "${SCRIPT_DIR}/deploy-workstation.sh" \
         --project "${PROJECT_ID}" \
         --region "${REGION}" \

@@ -25,7 +25,7 @@ This process is fully idempotent; re-running `workstation.sh setup` will skip ex
 ## Quick Start
 
 1. Fork and clone this repo
-2. Run `bash scripts/workstation.sh setup --project YOUR_PROJECT_ID --api-key YOUR_API_KEY`
+2. Run `bash scripts/workstation.sh setup --project YOUR_PROJECT_ID `
 
 ## Setup
 
@@ -48,10 +48,10 @@ gcloud auth login
 ```bash
 git clone https://github.com/your-github-username/platform-ops.git
 cd platform-ops/cloudworkstations/sway
-bash scripts/workstation.sh setup --project YOUR_PROJECT_ID --api-key "YOUR_GOOGLE_API_KEY"
+bash scripts/workstation.sh setup --project YOUR_PROJECT_ID 
 ```
 
-Replace `YOUR_PROJECT_ID` with your GCP project ID and provide your API Key. The script now uses flag-based arguments for clarity and provides colorized, real-time feedback.
+Replace `YOUR_PROJECT_ID` with your GCP project ID . The script provides colorized, real-time feedback.
 
 ### Step 3 (optional): Get notified when it's done
 
@@ -60,7 +60,7 @@ Replace `YOUR_PROJECT_ID` with your GCP project ID and provide your API Key. The
 1. Open [Google Chat](https://chat.google.com) → Create a Space → Space name → **Apps & integrations** → **Manage webhooks** → Copy URL
 
 ```bash
-bash scripts/workstation.sh setup --project YOUR_PROJECT_ID --api-key "..." --webhook "YOUR_WEBHOOK_URL"
+bash scripts/workstation.sh setup --project YOUR_PROJECT_ID --webhook "YOUR_WEBHOOK_URL"
 ```
 
 You'll receive notifications when:
@@ -86,13 +86,13 @@ Choose a profile to control what gets installed:
 
 ```bash
 # Default (full profile)
-bash scripts/workstation.sh setup --project YOUR_PROJECT_ID --api-key YOUR_API_KEY
+bash scripts/workstation.sh setup --project YOUR_PROJECT_ID 
 
 # Minimal profile (fastest)
-bash scripts/workstation.sh setup --project YOUR_PROJECT_ID --api-key YOUR_API_KEY --profile minimal
+bash scripts/workstation.sh setup --project YOUR_PROJECT_ID  --profile minimal
 
 # Custom modules
-bash scripts/workstation.sh setup --project YOUR_PROJECT_ID --api-key YOUR_API_KEY --profile custom --modules "ides,ai-tools"
+bash scripts/workstation.sh setup --project YOUR_PROJECT_ID  --profile custom --modules "ides,ai-tools"
 ```
 
 The `~/.ws-modules` config file records which modules are enabled. Boot scripts and tests automatically adapt to the selected profile.
@@ -259,7 +259,7 @@ Tests cover: Nix, GPU, Sway, fonts, shell, AI tools, IDEs, languages, keybinding
 The setup is fully **idempotent**. If it fails or you want to update, just run it again:
 
 ```bash
-bash scripts/workstation.sh setup -p YOUR_PROJECT_ID -k YOUR_API_KEY
+bash scripts/workstation.sh setup -p YOUR_PROJECT_ID 
 ```
 
 Existing resources are detected and skipped. Only missing components are created.
