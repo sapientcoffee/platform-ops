@@ -63,7 +63,8 @@ START_TIME=$(date +%s)
 if [ -d "/workspace/repo/cloudworkstations/sway" ]; then
     REPO_DIR="/workspace/repo"
 else
-    REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+    # derive from script location (assumed to be REPO_ROOT/cloudworkstations/sway/scripts/...)
+    REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 fi
 
 notify() {

@@ -72,21 +72,22 @@ if ! gcloud pubsub topics describe "$TOPIC_NAME" --project="$PROJECT_ID" >/dev/n
     gcloud pubsub topics create "$TOPIC_NAME" --project="$PROJECT_ID"
 fi
 
-# For Pub/Sub triggers using a build-config, we must specify the repository
-# and use the repo-owner/repo-name format.
+# For Pub/Sub triggers using a build-config, we must specify the repository.
+# Note: This requires the repository to be connected as a 2nd-gen repository resource
+# or use the full repository resource name. For now, we'll try the most compatible
+# format or log a warning if it fails.
 gcloud builds triggers create pubsub \
     --name="${TRIGGER_WEEKLY_NAME}" \
     --project="$PROJECT_ID" \
     --region="$REGION" \
     --topic="projects/${PROJECT_ID}/topics/${TOPIC_NAME}" \
-    --repo-owner="$REPO_OWNER" \
-    --repo-name="$REPO_NAME" \
+    --repo="https://github.com/${REPO_OWNER}/${REPO_NAME}" \
     --repo-type="GITHUB" \
     --branch="main" \
     --build-config="cloudworkstations/sway/cloudbuild-image.yaml" \
     --substitutions="_REGION=${REGION},_AR_REPO=${AR_REPO}" \
     --description="Weekly Tuesday roast" \
-    --quiet || log_warn "Could not create Pub/Sub trigger"
+    --quiet || log_warn "Could not create Pub/Sub trigger. You may need to connect your repository in the GCP Console first."
 
 log_info "🍰 Scheduling the Tuesday afternoon rebuild..."
 gcloud scheduler jobs create pubsub "${SCHEDULER_JOB_NAME}" \
