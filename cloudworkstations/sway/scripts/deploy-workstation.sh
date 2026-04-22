@@ -22,15 +22,17 @@ WEBHOOK_URL=""
 USER_ACCOUNT=""
 PROFILE="full"
 CUSTOM_MODULES=""
+FORCE_REBUILD=false
 
 while [[ $# -gt 0 ]]; do
     case $1 in
-        --project) PROJECT_ID="$2"; shift 2 ;;
-        --region)  REGION_FLAG="$2"; shift 2 ;;
-        --webhook) WEBHOOK_URL="$2"; shift 2 ;;
-        --account) USER_ACCOUNT="$2"; shift 2 ;;
-        --profile) PROFILE="$2"; shift 2 ;;
-        --modules) CUSTOM_MODULES="$2"; shift 2 ;;
+        --project)       PROJECT_ID="$2"; shift 2 ;;
+        --region)        REGION_FLAG="$2"; shift 2 ;;
+        --webhook)       WEBHOOK_URL="$2"; shift 2 ;;
+        --account)       USER_ACCOUNT="$2"; shift 2 ;;
+        --profile)       PROFILE="$2"; shift 2 ;;
+        --modules)       CUSTOM_MODULES="$2"; shift 2 ;;
+        --force-rebuild) FORCE_REBUILD=true; shift ;;
         *) shift ;;
     esac
 done

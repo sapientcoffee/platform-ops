@@ -52,7 +52,8 @@ if [ -z "$REPO_NAME" ] || [ -z "$REPO_OWNER" ]; then
     log_warn "Could not detect repo. Event-based roasting skipped."
 else
     log_info "🔥 Creating the 'Update on Change' trigger..."
-    gcloud builds triggers create github \
+    # Wrap in subshell to prevent set -e from exiting if repo isn't connected
+    (gcloud builds triggers create github \
         --name="${TRIGGER_ON_CHANGE_NAME}" \
         --project="$PROJECT_ID" \
         --region="$REGION" \
@@ -63,7 +64,7 @@ else
         --included-files="cloudworkstations/sway/workstation-image/**" \
         --substitutions="_REGION=${REGION},_AR_REPO=${AR_REPO}" \
         --description="Rebuilds image when the configuration changes" \
-        --quiet || log_warn "  Could not create GitHub trigger"
+        --quiet) || log_warn "Could not create GitHub trigger (is the repo connected?)"
 fi
 
 log_info "⏰ Creating the 'Weekly Rebuild' trigger..."
@@ -71,15 +72,21 @@ if ! gcloud pubsub topics describe "$TOPIC_NAME" --project="$PROJECT_ID" >/dev/n
     gcloud pubsub topics create "$TOPIC_NAME" --project="$PROJECT_ID"
 fi
 
+# For Pub/Sub triggers using a build-config, we must specify the repository
+# and use the repo-owner/repo-name format.
 gcloud builds triggers create pubsub \
     --name="${TRIGGER_WEEKLY_NAME}" \
     --project="$PROJECT_ID" \
     --region="$REGION" \
     --topic="projects/${PROJECT_ID}/topics/${TOPIC_NAME}" \
+    --repo-owner="$REPO_OWNER" \
+    --repo-name="$REPO_NAME" \
+    --repo-type="GITHUB" \
+    --branch="main" \
     --build-config="cloudworkstations/sway/cloudbuild-image.yaml" \
     --substitutions="_REGION=${REGION},_AR_REPO=${AR_REPO}" \
     --description="Weekly Tuesday roast" \
-    --quiet
+    --quiet || log_warn "Could not create Pub/Sub trigger"
 
 log_info "🍰 Scheduling the Tuesday afternoon rebuild..."
 gcloud scheduler jobs create pubsub "${SCHEDULER_JOB_NAME}" \

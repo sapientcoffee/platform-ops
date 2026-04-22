@@ -141,7 +141,9 @@ if [ "$COMMAND" = "setup" ]; then
     IMAGE_EXISTS=$(gcloud artifacts docker images list "${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPO}/workstation" \
         --project="$PROJECT_ID" --format="value(package)" --limit=1 2>/dev/null || true)
     
-    if [ -n "$IMAGE_EXISTS" ]; then
+    if [ "$FORCE_REBUILD" = true ]; then
+        log_info "  🔥 Image found or not, we are roasting a fresh batch (Force Rebuild)."
+    elif [ -n "$IMAGE_EXISTS" ]; then
         log_info "  ✅ Image found in registry."
     else
         log_info "  🧊 No image found. We'll need a full froth."
@@ -156,8 +158,8 @@ if [ "$COMMAND" = "setup" ]; then
         log_info "  ✅ Automated triggers are already configured."
     else
         log_info "  🆕 Triggers are missing. Configuring automated roasting now..."
-        bash "${SCRIPT_DIR}/configure-automation.sh" --project "$PROJECT_ID" --region "$REGION"
-        log_info "  ✅ Automated triggers successfully added to your order."
+        # Pass repo info if we can, but let the script auto-detect
+        (bash "${SCRIPT_DIR}/configure-automation.sh" --project "$PROJECT_ID" --region "$REGION" || log_warn "Trigger configuration incomplete.")
     fi
 
     # --- Ensure default VPC network exists ---
